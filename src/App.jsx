@@ -44,31 +44,34 @@ export default function App() {
 
         {/* Scrolling System Environment Workspace */}
         <main className="flex-1 p-4 md:p-6 overflow-y-auto space-y-6 max-w-[1800px] w-full mx-auto">
-          {/* Static Top-Row Diagnostics Grid */}
+          {/* Dynamic Top-Row Diagnostics Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Card 1: Operator Identity */}
             <div className="p-4 bg-hmi-panel border border-hmi-border rounded-lg shadow-sm">
-              <div className="text-[10px] uppercase tracking-wider text-text-muted font-bold mb-1">
-                Core Architecture
+              <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted font-black mb-1">
+                OPERATOR_ID
               </div>
-              <div className="font-display text-lg font-bold text-text-primary">
-                React + Vite + Tailwind
+              <div className="font-display text-lg font-bold text-text-primary tracking-wide uppercase">
+                Jonathon Gilliam
               </div>
             </div>
 
+            {/* Card 2: Field Experience Metric */}
             <div className="p-4 bg-hmi-panel border border-hmi-border rounded-lg shadow-sm">
-              <div className="text-[10px] uppercase tracking-wider text-text-muted font-bold mb-1">
-                UI Responsive Breakpoint
+              <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted font-black mb-1">
+                PRIMARY_METRIC
               </div>
-              <div className="font-display text-lg font-bold text-status-info">
-                Adaptive Scale HMI
+              <div className="font-display text-lg font-bold text-accent tracking-wide">
+                6+ Yrs Field Ops
               </div>
             </div>
 
+            {/* Card 3: Contextual Node Identifier */}
             <div className="p-4 bg-hmi-panel border border-hmi-border rounded-lg shadow-sm sm:col-span-2 lg:col-span-1">
-              <div className="text-[10px] uppercase tracking-wider text-text-muted font-bold mb-1">
-                Active Register Node
+              <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted font-black mb-1">
+                ACTIVE_REGISTER_NODE
               </div>
-              <div className="font-mono text-lg font-bold text-status-warn">
+              <div className="font-mono text-lg font-bold text-status-info uppercase">
                 {NAV_REGISTRY[activeProject].id}
               </div>
             </div>

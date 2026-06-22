@@ -49,14 +49,17 @@
 }
 
 @layer base {
-  /* Prevent the browser's text-select (I-beam) cursor from appearing over
-     static labels, IDs, tags, and descriptions. Only elements that are
-     actually interactive — buttons, links, and anything explicitly
-     editable — should show a cursor implying you can click or type. */
-  * {
+  /* Set the default cursor at the root level instead of using * */
+  html {
     cursor: default;
+    /* Prevent text highlighting across the entire application */
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */
   }
 
+  /* Force interactive elements to use pointer */
   button:not(:disabled),
   a[href],
   [role="button"]:not([aria-disabled="true"]),
@@ -65,8 +68,21 @@
     cursor: pointer;
   }
 
+  /* CRUCIAL FIX: Force all child elements inside interactive elements 
+     to inherit the parent's pointer cursor, overriding the root default */
+  button *,
+  a *,
+  [role="button"] * {
+    cursor: inherit;
+  }
+
   button:disabled,
   [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+
+  button:disabled *,
+  [aria-disabled="true"] * {
     cursor: not-allowed;
   }
 
