@@ -1044,10 +1044,620 @@ function ExtendoConveyorDiagram() {
   );
 }
 
+function SorterBeltLayoutDiagram() {
+  // Linear left-to-right package flow — two parallel sorter sides (SS1, SS2).
+  // Each side: Singulator System → Scan Tunnel Belt → Exit Belt
+  // SS1_4 is the fault asset on Side 1. SS2_4 is the healthy equivalent on Side 2.
+  // Package flow runs left → right through each row.
+
+  const ROW = {
+    ss2: 90, // y-center of SS2 row (top)
+    gap: 155, // divider line between sides
+    ss1: 210, // y-center of SS1 row (bottom — fault side, closer to SS2)
+  };
+  const H = 60; // box height
+  const COLS = { sing: 130, scan: 390, exit: 650 }; // x-centers of 3 columns
+  const W = { sing: 190, scan: 200, exit: 160 }; // box widths
+
+  // GAP = space between arrowhead tip and box edge
+  const GAP = 18;
+  const arrow = (x1, y1, x2, y2) => {
+    // line starts GAP away from source, ends GAP+10 away from target
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const len = Math.sqrt(dx * dx + dy * dy);
+    const ux = dx / len;
+    const uy = dy / len;
+    const sx = x1 + ux * GAP;
+    const sy = y1 + uy * GAP;
+    const tx = x2 - ux * (GAP + 10);
+    const ty = y2 - uy * (GAP + 10);
+    return { path: `M ${sx} ${sy} L ${tx} ${ty}`, tipX: tx, tipY: ty, ux, uy };
+  };
+
+  return (
+    <svg
+      viewBox="0 0 760 400"
+      className="w-full h-auto"
+      role="img"
+      aria-label="Sorter system belt layout showing two parallel sides, each with singulator belts feeding into scan tunnel belt then exit belt. SS1_4 on side 1 is the fault asset."
+    >
+      <title>Sorter belt layout — SS1 / SS2 parallel sides</title>
+
+      {/* ── SIDE LABELS ── */}
+      <text
+        x="18"
+        y={ROW.ss2 + 5}
+        textAnchor="middle"
+        fontFamily="var(--font-mono)"
+        fontSize="8"
+        fontWeight="700"
+        fill="var(--color-text-muted)"
+        transform={`rotate(-90, 18, ${ROW.ss2 + 5})`}
+      >
+        SIDE 2
+      </text>
+      <text
+        x="18"
+        y={ROW.ss1 + 5}
+        textAnchor="middle"
+        fontFamily="var(--font-mono)"
+        fontSize="8"
+        fontWeight="700"
+        fill="var(--color-status-alarm)"
+        transform={`rotate(-90, 18, ${ROW.ss1 + 5})`}
+      >
+        SIDE 1
+      </text>
+
+      {/* ── COLUMN HEADERS ── */}
+      {[
+        { x: COLS.sing, label: "SINGULATOR BELTS / SYSTEM" },
+        { x: COLS.scan, label: "SCAN TUNNEL BELT" },
+        { x: COLS.exit, label: "EXIT BELT" },
+      ].map((h, i) => (
+        <text
+          key={i}
+          x={h.x}
+          y="28"
+          textAnchor="middle"
+          fontFamily="var(--font-mono)"
+          fontSize="8"
+          fontWeight="700"
+          fill="var(--color-text-muted)"
+          letterSpacing="1"
+        >
+          {h.label}
+        </text>
+      ))}
+
+      {/* ── DIVIDER LINE between sides ── */}
+      <line
+        x1="30"
+        y1={ROW.gap}
+        x2="730"
+        y2={ROW.gap}
+        stroke="var(--color-hmi-border)"
+        strokeWidth="1"
+        strokeDasharray="6,4"
+        opacity="0.5"
+      />
+      <text
+        x="380"
+        y={ROW.gap - 4}
+        textAnchor="middle"
+        fontFamily="var(--font-mono)"
+        fontSize="7"
+        fill="var(--color-hmi-divider)"
+      >
+        — SORTER SIDE BOUNDARY —
+      </text>
+
+      {/* ── SS2 ROW (top, healthy) ── */}
+      {/* SS2 Singulator */}
+      <rect
+        x={COLS.sing - W.sing / 2}
+        y={ROW.ss2 - H / 2}
+        width={W.sing}
+        height={H}
+        rx="6"
+        fill="var(--color-hmi-surface)"
+        stroke="var(--color-hmi-divider)"
+        strokeWidth="1.5"
+      />
+      <text
+        x={COLS.sing}
+        y={ROW.ss2 - 6}
+        textAnchor="middle"
+        fontFamily="var(--font-mono)"
+        fontSize="11"
+        fontWeight="700"
+        fill="var(--color-text-primary)"
+      >
+        SINGULATOR
+      </text>
+      <text
+        x={COLS.sing}
+        y={ROW.ss2 + 10}
+        textAnchor="middle"
+        fontFamily="var(--font-mono)"
+        fontSize="9"
+        fill="var(--color-text-muted)"
+      >
+        Side 2 Feed
+      </text>
+
+      {/* SS2_4 scan tunnel */}
+      <rect
+        x={COLS.scan - W.scan / 2}
+        y={ROW.ss2 - H / 2}
+        width={W.scan}
+        height={H}
+        rx="6"
+        fill="var(--color-hmi-surface)"
+        stroke="var(--color-hmi-divider)"
+        strokeWidth="1.5"
+      />
+      <text
+        x={COLS.scan}
+        y={ROW.ss2 - 6}
+        textAnchor="middle"
+        fontFamily="var(--font-mono)"
+        fontSize="11"
+        fontWeight="700"
+        fill="var(--color-text-primary)"
+      >
+        SS2_4
+      </text>
+      <text
+        x={COLS.scan}
+        y={ROW.ss2 + 10}
+        textAnchor="middle"
+        fontFamily="var(--font-mono)"
+        fontSize="9"
+        fill="var(--color-text-muted)"
+      >
+        Scan Tunnel Belt
+      </text>
+
+      {/* SS2_5 exit */}
+      <rect
+        x={COLS.exit - W.exit / 2}
+        y={ROW.ss2 - H / 2}
+        width={W.exit}
+        height={H}
+        rx="6"
+        fill="var(--color-hmi-surface)"
+        stroke="var(--color-hmi-divider)"
+        strokeWidth="1.5"
+      />
+      <text
+        x={COLS.exit}
+        y={ROW.ss2 - 6}
+        textAnchor="middle"
+        fontFamily="var(--font-mono)"
+        fontSize="11"
+        fontWeight="700"
+        fill="var(--color-text-primary)"
+      >
+        SS2_5
+      </text>
+      <text
+        x={COLS.exit}
+        y={ROW.ss2 + 10}
+        textAnchor="middle"
+        fontFamily="var(--font-mono)"
+        fontSize="9"
+        fill="var(--color-text-muted)"
+      >
+        Exit Belt
+      </text>
+
+      {/* SS2 flow arrows */}
+      {(() => {
+        const a = arrow(
+          COLS.sing + W.sing / 2,
+          ROW.ss2,
+          COLS.scan - W.scan / 2,
+          ROW.ss2,
+        );
+        return (
+          <g>
+            <path
+              d={a.path}
+              fill="none"
+              stroke="var(--color-hmi-divider)"
+              strokeWidth="1.5"
+            />
+            <polygon
+              points={`${a.tipX},${a.tipY - 4} ${a.tipX + 10},${a.tipY} ${a.tipX},${a.tipY + 4}`}
+              fill="var(--color-hmi-divider)"
+            />
+          </g>
+        );
+      })()}
+      {(() => {
+        const a = arrow(
+          COLS.scan + W.scan / 2,
+          ROW.ss2,
+          COLS.exit - W.exit / 2,
+          ROW.ss2,
+        );
+        return (
+          <g>
+            <path
+              d={a.path}
+              fill="none"
+              stroke="var(--color-hmi-divider)"
+              strokeWidth="1.5"
+            />
+            <polygon
+              points={`${a.tipX},${a.tipY - 4} ${a.tipX + 10},${a.tipY} ${a.tipX},${a.tipY + 4}`}
+              fill="var(--color-hmi-divider)"
+            />
+          </g>
+        );
+      })()}
+
+      {/* ── SS1 ROW (bottom, FAULT SIDE) ── */}
+      {/* SS1 Singulator */}
+      <rect
+        x={COLS.sing - W.sing / 2}
+        y={ROW.ss1 - H / 2}
+        width={W.sing}
+        height={H}
+        rx="6"
+        fill="var(--color-hmi-surface)"
+        stroke="var(--color-hmi-divider)"
+        strokeWidth="1.5"
+      />
+      <text
+        x={COLS.sing}
+        y={ROW.ss1 - 6}
+        textAnchor="middle"
+        fontFamily="var(--font-mono)"
+        fontSize="11"
+        fontWeight="700"
+        fill="var(--color-text-primary)"
+      >
+        SINGULATOR
+      </text>
+      <text
+        x={COLS.sing}
+        y={ROW.ss1 + 10}
+        textAnchor="middle"
+        fontFamily="var(--font-mono)"
+        fontSize="9"
+        fill="var(--color-text-muted)"
+      >
+        Side 1 Feed
+      </text>
+
+      {/* SS1_4 — FAULT ASSET */}
+      <rect
+        x={COLS.scan - W.scan / 2}
+        y={ROW.ss1 - H / 2}
+        width={W.scan}
+        height={H}
+        rx="6"
+        fill="var(--color-hmi-surface)"
+        stroke="var(--color-status-alarm)"
+        strokeWidth="2.5"
+      />
+      {/* Belt ribs */}
+      {Array.from({ length: 10 }).map((_, i) => (
+        <line
+          key={i}
+          x1={COLS.scan - W.scan / 2 + 14 + i * 20}
+          y1={ROW.ss1 - H / 2 + 4}
+          x2={COLS.scan - W.scan / 2 + 14 + i * 20}
+          y2={ROW.ss1 + H / 2 - 4}
+          stroke="var(--color-status-alarm)"
+          strokeWidth="0.5"
+          opacity="0.25"
+        />
+      ))}
+      <text
+        x={COLS.scan}
+        y={ROW.ss1 - 10}
+        textAnchor="middle"
+        fontFamily="var(--font-mono)"
+        fontSize="13"
+        fontWeight="700"
+        fill="var(--color-status-alarm)"
+      >
+        SS1_4
+      </text>
+      <text
+        x={COLS.scan}
+        y={ROW.ss1 + 6}
+        textAnchor="middle"
+        fontFamily="var(--font-mono)"
+        fontSize="9"
+        fill="var(--color-text-muted)"
+      >
+        Scan Tunnel Belt
+      </text>
+      <text
+        x={COLS.scan}
+        y={ROW.ss1 + 20}
+        textAnchor="middle"
+        fontFamily="var(--font-mono)"
+        fontSize="7.5"
+        fontWeight="700"
+        fill="var(--color-status-alarm)"
+      >
+        ⚠ FAULT ASSET — Speed above spec
+      </text>
+
+      {/* SS1_5 exit */}
+      <rect
+        x={COLS.exit - W.exit / 2}
+        y={ROW.ss1 - H / 2}
+        width={W.exit}
+        height={H}
+        rx="6"
+        fill="var(--color-hmi-surface)"
+        stroke="var(--color-hmi-divider)"
+        strokeWidth="1.5"
+      />
+      <text
+        x={COLS.exit}
+        y={ROW.ss1 - 6}
+        textAnchor="middle"
+        fontFamily="var(--font-mono)"
+        fontSize="11"
+        fontWeight="700"
+        fill="var(--color-text-primary)"
+      >
+        SS1_5
+      </text>
+      <text
+        x={COLS.exit}
+        y={ROW.ss1 + 10}
+        textAnchor="middle"
+        fontFamily="var(--font-mono)"
+        fontSize="9"
+        fill="var(--color-text-muted)"
+      >
+        Exit Belt
+      </text>
+
+      {/* SS1 flow arrows */}
+      {(() => {
+        const a = arrow(
+          COLS.sing + W.sing / 2,
+          ROW.ss1,
+          COLS.scan - W.scan / 2,
+          ROW.ss1,
+        );
+        return (
+          <g>
+            <path
+              d={a.path}
+              fill="none"
+              stroke="var(--color-status-alarm)"
+              strokeWidth="1.5"
+              opacity="0.6"
+            />
+            <polygon
+              points={`${a.tipX},${a.tipY - 4} ${a.tipX + 10},${a.tipY} ${a.tipX},${a.tipY + 4}`}
+              fill="var(--color-status-alarm)"
+              opacity="0.6"
+            />
+          </g>
+        );
+      })()}
+      {(() => {
+        const a = arrow(
+          COLS.scan + W.scan / 2,
+          ROW.ss1,
+          COLS.exit - W.exit / 2,
+          ROW.ss1,
+        );
+        return (
+          <g>
+            <path
+              d={a.path}
+              fill="none"
+              stroke="var(--color-status-alarm)"
+              strokeWidth="1.5"
+              opacity="0.6"
+            />
+            <polygon
+              points={`${a.tipX},${a.tipY - 4} ${a.tipX + 10},${a.tipY} ${a.tipX},${a.tipY + 4}`}
+              fill="var(--color-status-alarm)"
+              opacity="0.6"
+            />
+          </g>
+        );
+      })()}
+
+      {/* ── PE CALLOUTS on SS1_4 ── */}
+      {/* PE1 — entry, packages confirmed */}
+      <circle
+        cx={COLS.scan - W.scan / 2 + 36}
+        cy={ROW.ss1 - H / 2 - 18}
+        r="12"
+        fill="var(--color-hmi-bg)"
+        stroke="var(--color-status-ok)"
+        strokeWidth="2"
+      />
+      <circle
+        cx={COLS.scan - W.scan / 2 + 36}
+        cy={ROW.ss1 - H / 2 - 18}
+        r="4"
+        fill="var(--color-status-ok)"
+      />
+      <text
+        x={COLS.scan - W.scan / 2 + 36}
+        y={ROW.ss1 - H / 2 - 36}
+        textAnchor="middle"
+        fontFamily="var(--font-mono)"
+        fontSize="7.5"
+        fontWeight="700"
+        fill="var(--color-status-ok)"
+      >
+        PE1 ✓
+      </text>
+
+      {/* PE2 — exit, packages lost */}
+      <circle
+        cx={COLS.scan + W.scan / 2 - 36}
+        cy={ROW.ss1 - H / 2 - 18}
+        r="12"
+        fill="var(--color-hmi-bg)"
+        stroke="var(--color-status-alarm)"
+        strokeWidth="2"
+      />
+      <circle
+        cx={COLS.scan + W.scan / 2 - 36}
+        cy={ROW.ss1 - H / 2 - 18}
+        r="4"
+        fill="var(--color-status-alarm)"
+      />
+      <text
+        x={COLS.scan + W.scan / 2 - 36}
+        y={ROW.ss1 - H / 2 - 36}
+        textAnchor="middle"
+        fontFamily="var(--font-mono)"
+        fontSize="7.5"
+        fontWeight="700"
+        fill="var(--color-status-alarm)"
+      >
+        PE2 ✕
+      </text>
+
+      {/* ── CALLOUT BOXES below SS1_4 ── */}
+      {/* Tachometer */}
+      <rect
+        x={COLS.scan - 100}
+        y={ROW.ss1 + H / 2 + 14}
+        width="200"
+        height="34"
+        rx="4"
+        fill="var(--color-hmi-surface)"
+        stroke="var(--color-status-warn)"
+        strokeWidth="1.5"
+      />
+      <text
+        x={COLS.scan}
+        y={ROW.ss1 + H / 2 + 28}
+        textAnchor="middle"
+        fontFamily="var(--font-mono)"
+        fontSize="8"
+        fontWeight="700"
+        fill="var(--color-status-warn)"
+      >
+        ⊙ TACHOMETER
+      </text>
+      <text
+        x={COLS.scan}
+        y={ROW.ss1 + H / 2 + 41}
+        textAnchor="middle"
+        fontFamily="var(--font-mono)"
+        fontSize="7.5"
+        fill="var(--color-text-muted)"
+      >
+        SS1_4 above spec — confirmed
+      </text>
+
+      {/* Studio 5000 */}
+      <rect
+        x={COLS.scan - 110}
+        y={ROW.ss1 + H / 2 + 56}
+        width="220"
+        height="34"
+        rx="4"
+        fill="var(--color-hmi-surface)"
+        stroke="var(--color-status-info)"
+        strokeWidth="1.5"
+      />
+      <text
+        x={COLS.scan}
+        y={ROW.ss1 + H / 2 + 70}
+        textAnchor="middle"
+        fontFamily="var(--font-mono)"
+        fontSize="8"
+        fontWeight="700"
+        fill="var(--color-status-info)"
+      >
+        STUDIO 5000 — ONLINE MODE
+      </text>
+      <text
+        x={COLS.scan}
+        y={ROW.ss1 + H / 2 + 83}
+        textAnchor="middle"
+        fontFamily="var(--font-mono)"
+        fontSize="7.5"
+        fill="var(--color-text-muted)"
+      >
+        SS1_4.Speed corrected → CPROM burn
+      </text>
+
+      {/* ── LEGEND ── */}
+      <g fontFamily="var(--font-mono)" fontSize="8.5">
+        <circle cx="40" cy="352" r="5" fill="var(--color-status-ok)" />
+        <text x="52" y="356" fill="var(--color-text-muted)">
+          PE confirmed
+        </text>
+        <circle cx="160" cy="352" r="5" fill="var(--color-status-alarm)" />
+        <text x="172" y="356" fill="var(--color-status-alarm)">
+          PE lost / fault
+        </text>
+        <rect
+          x="278"
+          y="347"
+          width="14"
+          height="10"
+          rx="2"
+          fill="var(--color-hmi-surface)"
+          stroke="var(--color-hmi-divider)"
+          strokeWidth="1"
+        />
+        <text x="298" y="356" fill="var(--color-text-muted)">
+          Healthy belt
+        </text>
+        <line
+          x1="400"
+          y1="352"
+          x2="424"
+          y2="352"
+          stroke="var(--color-status-alarm)"
+          strokeWidth="2"
+        />
+        <polygon
+          points="424,348 434,352 424,356"
+          fill="var(--color-status-alarm)"
+        />
+        <text x="440" y="356" fill="var(--color-status-alarm)">
+          Fault side flow
+        </text>
+        <line
+          x1="570"
+          y1="352"
+          x2="594"
+          y2="352"
+          stroke="var(--color-hmi-divider)"
+          strokeWidth="2"
+        />
+        <polygon
+          points="594,348 604,352 594,356"
+          fill="var(--color-hmi-divider)"
+        />
+        <text x="610" y="356" fill="var(--color-text-muted)">
+          Normal flow
+        </text>
+      </g>
+    </svg>
+  );
+}
+
 const DIAGRAM_COMPONENTS = {
   NETWORK_TOPOLOGY: NetworkTopologyDiagram,
   SAFETY_INTERLOCK: SafetyInterlockDiagram,
   EXTENDO_CONVEYOR: ExtendoConveyorDiagram,
+  SORTER_BELT_LAYOUT: SorterBeltLayoutDiagram,
 };
 
 export default function SchematicDiagram({ diagramType }) {

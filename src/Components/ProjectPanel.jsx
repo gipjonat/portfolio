@@ -303,37 +303,71 @@ function ProjectLayoutPanel({ activeKey, data }) {
 
       {activeKey === "CONTACT" && (
         <div className="pt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <a
-            href="mailto:your.email@example.com"
-            className="p-5 bg-hmi-surface border border-hmi-border rounded-xl text-center hover:border-status-info group transition-all"
-          >
-            <div className="text-2xl mb-1 group-hover:scale-110 transition-transform">
+          <div className="p-5 bg-hmi-surface border border-hmi-border rounded-xl text-center space-y-3">
+            <div className="text-2xl">
               <FontAwesomeIcon icon={ICONS.email} />
             </div>
             <div className="text-sm font-black text-text-primary">
               INITIATE_EMAIL_PING
             </div>
-            <div className="text-xs text-text-muted mt-1 font-sans">
-              Open default mail transport protocol
-            </div>
-          </a>
+            <a
+              href="mailto:Gipjonat@Gmail.com"
+              className="block text-xs font-bold text-status-info border border-status-info/30 bg-status-info/5 rounded-lg px-3 py-2 hover:bg-status-info/15 transition-colors font-mono"
+            >
+              OPEN MAIL APP
+            </a>
+            <button
+              onClick={() =>
+                navigator.clipboard.writeText("Gipjonat@Gmail.com").then(() => {
+                  const el = document.getElementById("email-copy-label");
+                  if (el) {
+                    el.textContent = "COPIED!";
+                    setTimeout(() => {
+                      el.textContent = "COPY EMAIL ADDRESS";
+                    }, 2000);
+                  }
+                })
+              }
+              className="block w-full text-xs font-bold text-text-muted border border-hmi-border bg-hmi-bg rounded-lg px-3 py-2 hover:bg-hmi-surface hover:text-text-primary transition-colors font-mono"
+            >
+              <span id="email-copy-label">COPY EMAIL ADDRESS</span>
+            </button>
+          </div>
 
-          <a
-            href="https://linkedin.com/in/your-profile"
-            target="_blank"
-            rel="noreferrer"
-            className="p-5 bg-hmi-surface border border-hmi-border rounded-xl text-center hover:border-status-ok group transition-all"
-          >
-            <div className="text-2xl mb-1 group-hover:scale-110 transition-transform">
+          <div className="p-5 bg-hmi-surface border border-hmi-border rounded-xl text-center space-y-3">
+            <div className="text-2xl">
               <FontAwesomeIcon icon={ICONS.linkedin} />
             </div>
             <div className="text-sm font-black text-text-primary">
               LINKEDIN_COMMS_HANDSHAKE
             </div>
-            <div className="text-xs text-text-muted mt-1 font-sans">
-              Establish secure professional network node sync
-            </div>
-          </a>
+            <a
+              href="https://www.linkedin.com/in/jbgilliam"
+              target="_blank"
+              rel="noreferrer"
+              className="block text-xs font-bold text-status-ok border border-status-ok/30 bg-status-ok/5 rounded-lg px-3 py-2 hover:bg-status-ok/15 transition-colors font-mono"
+            >
+              OPEN LINKEDIN
+            </a>
+            <button
+              onClick={() =>
+                navigator.clipboard
+                  .writeText("linkedin.com/in/jbgilliam")
+                  .then(() => {
+                    const el = document.getElementById("li-copy-label");
+                    if (el) {
+                      el.textContent = "COPIED!";
+                      setTimeout(() => {
+                        el.textContent = "COPY PROFILE URL";
+                      }, 2000);
+                    }
+                  })
+              }
+              className="block w-full text-xs font-bold text-text-muted border border-hmi-border bg-hmi-bg rounded-lg px-3 py-2 hover:bg-hmi-surface hover:text-text-primary transition-colors font-mono"
+            >
+              <span id="li-copy-label">COPY PROFILE URL</span>
+            </button>
+          </div>
         </div>
       )}
     </div>
