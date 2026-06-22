@@ -1,0 +1,78 @@
+@import url("https://fonts.googleapis.com/css2?family=Oxanium:wght@500;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap");
+@import "tailwindcss";
+
+@theme {
+  /* Neutral charcoal base — not pure black (too stark, per dark-UI
+     best practice), not warm brown (read as muddy in testing). Layered
+     darkness: each surface step is a touch lighter than the last,
+     giving depth without relying on shadows (which don't read on dark
+     backgrounds anyway). */
+  --color-hmi-bg: #0e1113; /* Main application backdrop */
+  --color-hmi-panel: #15191c; /* Enclosed modules, sidebars, control racks */
+  --color-hmi-surface: #1d2226; /* Nested card surfaces, input registers, button beds */
+
+  /* Structural borders — cool neutral, low-key, lets the accent colors
+     do the talking instead of competing with them. */
+  --color-hmi-border: #2a3035; /* Default terminal/panel split lines */
+  --color-hmi-divider: #3c444a; /* High-contrast sub-component boundaries */
+
+  /* Brand accent — separate from status semantics on purpose. This is
+     the site's one confident "personality" color: active nav state,
+     primary highlights, links. Cyan/teal is the real SCADA convention
+     for live telemetry and network data, so it reads as authentic
+     rather than decorative. */
+  --color-accent: #2dd4d9;
+  --color-accent-dim: #1a9ba0;
+
+  /* SCADA ISA-101 Standard Status Indicators — kept genuinely distinct
+     from the brand accent and from each other so each one still means
+     something specific when it fires, rather than blending into a
+     single "house color." */
+  --color-status-ok: #34d399; /* Operational, logic true */
+  --color-status-warn: #fbbf24; /* Active warning, unacknowledged bypass */
+  --color-status-alarm: #f87171; /* Hard fault, safety circuit tripped */
+  --color-status-info: #60a5fa; /* Telemetry feedback — pushed toward blue, away from the teal brand accent, so the two read as genuinely different hues at a glance */
+
+  /* Text layers — bright neutral gray rather than pure white (less
+     harsh on a dark background, easier on the eyes at length). */
+  --color-text-primary: #e8eaed;
+  --color-text-muted: #8b949a;
+
+  /* Two-tone HMI typography system:
+     - display: condensed, angular, technical — used for panel titles, the
+       app banner, and major headings. Reads like a console nameplate.
+     - mono: clean fixed-width — used for IDs, labels, status text, tags,
+       and anything resembling a live data readout. Unambiguous glyphs
+       (0/O, 1/l/I) matter here since it's standing in for telemetry. */
+  --font-display: "Oxanium", "system-ui", sans-serif;
+  --font-mono: "JetBrains Mono", "ui-monospace", "Menlo", monospace;
+}
+
+@layer base {
+  /* Prevent the browser's text-select (I-beam) cursor from appearing over
+     static labels, IDs, tags, and descriptions. Only elements that are
+     actually interactive — buttons, links, and anything explicitly
+     editable — should show a cursor implying you can click or type. */
+  * {
+    cursor: default;
+  }
+
+  button:not(:disabled),
+  a[href],
+  [role="button"]:not([aria-disabled="true"]),
+  select,
+  summary {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+
+  input,
+  textarea,
+  [contenteditable="true"] {
+    cursor: text;
+  }
+}
