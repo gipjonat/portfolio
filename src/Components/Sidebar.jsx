@@ -179,7 +179,7 @@ export default function Sidebar({
           server-side file can stay simply named. */}
       <div className="px-3 pb-3 shrink-0">
         <a
-          href="/Jonathon_Gilliam_Resume_2026.pdf"
+          href="/JGilliam_Resume.pdf"
           download="jonathon-gilliam-resume.pdf"
           className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border border-accent/40 bg-accent/10 text-accent text-xs font-bold tracking-wider uppercase hover:bg-accent/20 hover:border-accent/60 transition-colors"
         >
