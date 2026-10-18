@@ -18,11 +18,16 @@ import {
   faDownload,
   faXmark,
   faBars,
+  faArrowRight,
+  faArrowLeft,
+  faCopy,
+  faCheck,
+  faLocationDot,
 } from "@fortawesome/free-solid-svg-icons";
 import { faLinkedin } from "@fortawesome/free-brands-svg-icons";
 
 export const ICONS = {
-  // Section / nav icons (sectionRegistry.js)
+  // Section / nav icons
   systemConfig: faGear,
   registerMap: faSatelliteDish,
   fieldOps: faChartSimple,
@@ -35,7 +40,7 @@ export const ICONS = {
   safety: faShieldHalved,
   docsCad: faRulerCombined,
 
-  // ProjectPanel section icons
+  // Project page section icons
   engineeringScope: faGear,
   schematic: faRulerCombined,
   diagnosticTrace: faStethoscope,
@@ -44,9 +49,14 @@ export const ICONS = {
   tag: faScrewdriverWrench,
   email: faEnvelope,
   linkedin: faLinkedin,
+  location: faLocationDot,
 
   // Chrome / UI controls
   download: faDownload,
   close: faXmark,
   menu: faBars,
+  arrowRight: faArrowRight,
+  arrowLeft: faArrowLeft,
+  copy: faCopy,
+  check: faCheck,
 };
