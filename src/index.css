@@ -1,65 +1,94 @@
-@import url("https://fonts.googleapis.com/css2?family=Oxanium:wght@500;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 @theme {
-  /* Neutral charcoal base — not pure black (too stark, per dark-UI
-     best practice), not warm brown (read as muddy in testing). Layered
-     darkness: each surface step is a touch lighter than the last,
-     giving depth without relying on shadows (which don't read on dark
-     backgrounds anyway). */
-  --color-hmi-bg: #0e1113; /* Main application backdrop */
-  --color-hmi-panel: #15191c; /* Enclosed modules, sidebars, control racks */
-  --color-hmi-surface: #1d2226; /* Nested card surfaces, input registers, button beds */
+  /* Layered dark surfaces — each step a touch lighter than the last, so
+     depth comes from value, not shadows (which don't read on dark UI). */
+  --color-hmi-bg: #0d1013; /* Page backdrop */
+  --color-hmi-rail: #0a0d10; /* Sidebar — one step darker than the page */
+  --color-hmi-panel: #13181d; /* Cards, sections */
+  --color-hmi-surface: #181e24; /* Nested surfaces, hover beds */
 
-  /* Structural borders — cool neutral, low-key, lets the accent colors
-     do the talking instead of competing with them. */
-  --color-hmi-border: #2a3035; /* Default terminal/panel split lines */
-  --color-hmi-divider: #3c444a; /* High-contrast sub-component boundaries */
+  /* Structural borders */
+  --color-hmi-border: #232b33;
+  --color-hmi-divider: #3a4651;
 
-  /* Brand accent — separate from status semantics on purpose. This is
-     the site's one confident "personality" color: active nav state,
-     primary highlights, links. Cyan/teal is the real SCADA convention
-     for live telemetry and network data, so it reads as authentic
-     rather than decorative. */
-  --color-accent: #2dd4d9;
-  --color-accent-dim: #1a9ba0;
+  /* Brand accent — safety amber. The site's one confident personality
+     color: section labels, primary buttons, the monogram. */
+  --color-brand: #f2b33d;
+  --color-brand-ink: #15110a; /* Text on amber buttons */
 
-  /* SCADA ISA-101 Standard Status Indicators — kept genuinely distinct
-     from the brand accent and from each other so each one still means
-     something specific when it fires, rather than blending into a
-     single "house color." */
-  --color-status-ok: #34d399; /* Operational, logic true */
-  --color-status-warn: #fbbf24; /* Active warning, unacknowledged bypass */
-  --color-status-alarm: #f87171; /* Hard fault, safety circuit tripped */
-  --color-status-info: #60a5fa; /* Telemetry feedback — pushed toward blue, away from the teal brand accent, so the two read as genuinely different hues at a glance */
+  /* Secondary accent — SCADA teal. Links, the resume button, live data.
+     Token name kept as "accent" so the schematic diagrams still resolve it. */
+  --color-accent: #4fd1c5;
+  --color-accent-soft: #8de6dd;
+  --color-accent-dim: #2e6e68;
 
-  /* Text layers — bright neutral gray rather than pure white (less
-     harsh on a dark background, easier on the eyes at length). */
-  --color-text-primary: #e8eaed;
-  --color-text-muted: #8b949a;
+  /* ISA-101 style status colors — used by diagrams, timeline and tags,
+     kept distinct from the brand colors so each still means something. */
+  --color-status-ok: #3ddc97;
+  --color-status-warn: #fbbf24;
+  --color-status-alarm: #f0716b;
+  --color-status-info: #6aa8f0;
+  --color-status-soft: #c9b6f2; /* Off-the-clock / software */
 
-  /* Two-tone HMI typography system:
-     - display: condensed, angular, technical — used for panel titles, the
-       app banner, and major headings. Reads like a console nameplate.
-     - mono: clean fixed-width — used for IDs, labels, status text, tags,
-       and anything resembling a live data readout. Unambiguous glyphs
-       (0/O, 1/l/I) matter here since it's standing in for telemetry. */
-  --font-display: "Oxanium", "system-ui", sans-serif;
-  --font-mono: "JetBrains Mono", "ui-monospace", "Menlo", monospace;
+  /* Text layers — bright neutral gray, never pure white. */
+  --color-text-primary: #e7eaed;
+  --color-text-muted: #a3adb7;
+  --color-text-dim: #8a95a0;
+
+  /* Two-tone type system:
+     - sans: everything people read (headings, paragraphs, buttons).
+     - mono: labels, dates, tags, IDs and diagram text — the technical
+       "readout" layer. --font-display is kept as an alias so older
+       classes still resolve. */
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+  --font-display: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
 }
 
 @layer base {
-  /* Set the default cursor at the root level instead of using * */
   html {
-    cursor: default;
-    /* Prevent text highlighting across the entire application */
-    -webkit-user-select: none; /* Safari */
-    -moz-user-select: none; /* Firefox */
-    -ms-user-select: none; /* IE10+/Edge */
-    user-select: none; /* Standard */
+    scroll-behavior: smooth;
+    scroll-padding-top: 24px;
+    background: var(--color-hmi-bg);
   }
 
-  /* Force interactive elements to use pointer */
+  @media (max-width: 767px) {
+    html {
+      scroll-padding-top: 72px; /* clear the sticky mobile top bar */
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  body {
+    font-family: var(--font-sans);
+    color: var(--color-text-primary);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-brand) 35%, transparent);
+    color: var(--color-text-primary);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
   button:not(:disabled),
   a[href],
   [role="button"]:not([aria-disabled="true"]),
@@ -68,27 +97,18 @@
     cursor: pointer;
   }
 
-  /* CRUCIAL FIX: Force all child elements inside interactive elements 
-     to inherit the parent's pointer cursor, overriding the root default */
-  button *,
-  a *,
-  [role="button"] * {
-    cursor: inherit;
-  }
-
   button:disabled,
   [aria-disabled="true"] {
     cursor: not-allowed;
   }
+}
 
-  button:disabled *,
-  [aria-disabled="true"] * {
-    cursor: not-allowed;
-  }
-
-  input,
-  textarea,
-  [contenteditable="true"] {
-    cursor: text;
+@layer utilities {
+  /* Faint engineering grid-paper texture — the "DIY notebook" detail. */
+  .grid-paper {
+    background-image:
+      linear-gradient(rgb(255 255 255 / 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(255 255 255 / 0.035) 1px, transparent 1px);
+    background-size: 24px 24px;
   }
 }

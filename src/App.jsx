@@ -1,93 +1,99 @@
-import { useState } from "react";
-import Sidebar from "./components/Sidebar";
-import Header from "./components/Header";
-import ProjectPanel from "./components/ProjectPanel";
-import SkillsPanel from "./components/SkillsPanel";
-import { PROJECT_REGISTRY } from "./projectRegistry"; // External dataset link
-import { SKILLS_REGISTRY } from "./skillsRegistry";
+import { useEffect, useState } from "react";
+import Sidebar from "./Components/Sidebar";
+import Hero from "./Components/Hero";
+import ProjectsSection from "./Components/ProjectsSection";
+import ProjectDetail from "./Components/ProjectDetail";
+import ExperienceSection from "./Components/ExperienceSection";
+import SkillsSection from "./Components/SkillsSection";
+import AboutSection from "./Components/AboutSection";
+import ContactSection from "./Components/ContactSection";
+import Footer from "./Components/Footer";
+import { PROJECT_REGISTRY } from "./projectRegistry";
 
-// Combined nav registry: merges project entries with the skills page's
-// meta record so Sidebar's existing key/type filtering logic works
-// unmodified across both data sources.
-const NAV_REGISTRY = {
-  ...PROJECT_REGISTRY,
-  SKILLS: SKILLS_REGISTRY.meta,
-};
+// Tiny hash router — no dependency, works on GitHub Pages.
+//   #/projects/<slug>  → that project's case-study page
+//   #<section-id>      → homepage, scrolled to that section
+const PROJECT_ROUTE = /^#\/projects\/([\w-]+)$/;
+
+function readRoute() {
+  const hash = window.location.hash;
+  const match = hash.match(PROJECT_ROUTE);
+  if (match) {
+    const key = Object.keys(PROJECT_REGISTRY).find(
+      (k) => PROJECT_REGISTRY[k].slug === match[1],
+    );
+    if (key) return { view: "project", projectKey: key };
+  }
+  return { view: "home", section: hash.replace(/^#/, "") || null };
+}
 
 export default function App() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeProject, setActiveProject] = useState("ABOUT_ME");
+  const [route, setRoute] = useState(readRoute);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const onHash = () => {
+      setRoute(readRoute());
+      setMenuOpen(false);
+    };
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  // After a route change: project pages start at the top; homepage links
+  // scroll to their section (needed when coming back from a project page).
+  useEffect(() => {
+    if (route.view === "project") {
+      window.scrollTo({ top: 0 });
+      return;
+    }
+    if (route.section) {
+      const el = document.getElementById(route.section);
+      if (el) el.scrollIntoView();
+    }
+  }, [route]);
+
+  // Lock page scroll behind the open mobile menu.
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+  }, [menuOpen]);
+
+  const project =
+    route.view === "project" ? PROJECT_REGISTRY[route.projectKey] : null;
 
   return (
-    <div className="flex h-screen w-screen bg-hmi-bg text-text-primary font-mono overflow-hidden">
-      {/* 1. Re-architected Modular Sidebar Section */}
+    <div className="min-h-screen bg-hmi-bg text-text-primary md:flex">
       <Sidebar
-        projects={NAV_REGISTRY}
-        activeProject={activeProject}
-        setActiveProject={setActiveProject}
-        isOpen={isMobileMenuOpen}
-        setIsOpen={setIsMobileMenuOpen}
+        view={route.view}
+        isOpen={menuOpen}
+        setIsOpen={setMenuOpen}
       />
 
-      {/* Mobile background shadow block */}
-      {isMobileMenuOpen && (
+      {menuOpen && (
         <div
-          onClick={() => setIsMobileMenuOpen(false)}
-          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          onClick={() => setMenuOpen(false)}
+          className="fixed inset-0 z-40 bg-black/60 md:hidden"
+          aria-hidden="true"
         />
       )}
 
-      {/* Main Panel Content Frame */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* 2. Top Header Ribbon Module */}
-        <Header onMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)} />
-
-        {/* Scrolling System Environment Workspace */}
-        <main className="flex-1 p-4 md:p-6 overflow-y-auto space-y-6 max-w-[1800px] w-full mx-auto">
-          {/* Dynamic Top-Row Diagnostics Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {/* Card 1: Operator Identity */}
-            <div className="p-4 bg-hmi-panel border border-hmi-border rounded-lg shadow-sm">
-              <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted font-black mb-1">
-                OPERATOR_ID
-              </div>
-              <div className="font-display text-lg font-bold text-text-primary tracking-wide uppercase">
-                Jonathon Gilliam
-              </div>
-            </div>
-
-            {/* Card 2: Field Experience Metric */}
-            <div className="p-4 bg-hmi-panel border border-hmi-border rounded-lg shadow-sm">
-              <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted font-black mb-1">
-                PRIMARY_METRIC
-              </div>
-              <div className="font-display text-lg font-bold text-accent tracking-wide">
-                6+ Yrs Field Ops
-              </div>
-            </div>
-
-            {/* Card 3: Contextual Node Identifier */}
-            <div className="p-4 bg-hmi-panel border border-hmi-border rounded-lg shadow-sm sm:col-span-2 lg:col-span-1">
-              <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted font-black mb-1">
-                ACTIVE_REGISTER_NODE
-              </div>
-              <div className="font-mono text-lg font-bold text-status-info uppercase">
-                {NAV_REGISTRY[activeProject].id}
-              </div>
-            </div>
-          </div>
-
-          {/* 3. Interactive Main Dynamic Inspection Module */}
-          {activeProject === "SKILLS" ? (
-            <SkillsPanel activeKey={activeProject} data={SKILLS_REGISTRY} />
+      <main id="top" className="flex-1 min-w-0">
+        <div className="mx-auto max-w-[1120px] px-4 sm:px-8 lg:px-14 pb-16">
+          {project ? (
+            <ProjectDetail projectKey={route.projectKey} data={project} />
           ) : (
-            <ProjectPanel
-              activeKey={activeProject}
-              data={NAV_REGISTRY[activeProject]}
-            />
+            <div className="flex flex-col gap-24 md:gap-28">
+              <Hero />
+              <ProjectsSection />
+              <ExperienceSection />
+              <SkillsSection />
+              <AboutSection />
+              <ContactSection />
+            </div>
           )}
-        </main>
-      </div>
+          <Footer />
+        </div>
+      </main>
     </div>
   );
 }

@@ -39,6 +39,13 @@ export const PROJECT_REGISTRY = {
     id: "SYS-01",
     type: "PROJECT",
     title: "Extendo Conveyor Emergency Rewire & Controls Restoration",
+    // Homepage card fields — short versions of the full write-up below.
+    slug: "extendo-rewire",
+    cardTitle: "Extendo conveyor: dead inside a trailer",
+    summary:
+      "A failed cable carrier severed the main control harness at full extension, taking out boom controls, safety interlocks and MDR comms at once. Rewired boom-to-panel under LOTO and caught a slipping limit-switch gear on the way.",
+    category: "Troubleshooting",
+    cardStack: "Schematic tracing · Control wiring · Hydraulics",
     status: "RESOLVED",
     statusColor: "text-status-ok bg-status-ok/10 border-status-ok/20",
     metric: "Full Controls Restoration / 2-Day Turnaround",
@@ -138,6 +145,12 @@ export const PROJECT_REGISTRY = {
     id: "SYS-05",
     type: "PROJECT",
     title: "Sorter Belt Speed — Lost Tracking Root Cause & Fix",
+    slug: "sorter-lost-tracking",
+    cardTitle: "Sorter lost tracking: 5–6% down to under 1%",
+    summary:
+      "Thousands of packages a shift were losing tracking. Isolated it to one belt running over spec, confirmed with a tachometer, then traced the speed variable through live ladder logic in Studio 5000.",
+    category: "PLC / Studio 5000",
+    cardStack: "Studio 5000 · Online mode · Ladder logic",
     status: "RESOLVED",
     statusColor: "text-status-ok bg-status-ok/10 border-status-ok/20",
     metric: "Lost Tracking: ~5-6% → <1% / Thousands of Pkgs Recovered Nightly",
