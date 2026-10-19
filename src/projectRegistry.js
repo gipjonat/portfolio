@@ -50,8 +50,10 @@ export const PROJECT_REGISTRY = {
     statusColor: "text-status-ok bg-status-ok/10 border-status-ok/20",
     metric: "Dozens of drives tested before going into spares",
     description:
-      "My company buys PowerFlex 525 drives regularly as spares, and a new drive isn't a real spare until it's proven to work. So I built a cabinet to test them — the electrical design, wiring, E-stop circuit and PLC logic are all my own work. 480 V three-phase feeds the drive side of the panel, and a control transformer steps it down to 120 VAC for the logic side. A ControlLogix controller does the rest over EtherNet/IP: a new drive connects, receives its configuration automatically through Automatic Device Configuration (ADC), and the logic runs it and verifies its output voltage. Dozens of drives have been through it. Built entirely on Allen-Bradley hardware and software, and designed to grow into a bench for testing other PLC components.",
+      "My company buys PowerFlex 525 drives regularly as spares, and a new drive isn't a real spare until it's proven to work. So I built a cabinet to test them — the electrical design, wiring, E-stop circuit and PLC logic are all my own work. 480 V three-phase comes in through a knife switch box to feed the drives, and a step-down transformer brings it down to 120 VAC for the logic side, with a second transformer for clean PLC power. A ControlLogix controller does the rest over EtherNet/IP: a new drive connects, receives its configuration automatically through Automatic Device Configuration (ADC), and the logic runs it and verifies its output voltage. Dozens of drives have been through it. Built entirely on Allen-Bradley hardware and software, and designed to grow into a bench for testing other PLC components.",
     diagramType: "TEST_BENCH",
+    // Shown in this order on the project page.
+    diagrams: ["TEST_BENCH_LAYOUT", "TEST_BENCH"],
     model3d: "POWERFLEX_525",
     beforeAfter: {
       label: "New spare drives",
@@ -61,8 +63,13 @@ export const PROJECT_REGISTRY = {
     build: [
       {
         title: "Power distribution",
-        body: "Brought 480 V three-phase into the cabinet for the drive side, then stepped it down through a control transformer to 120 VAC for the logic side — keeping drive power and control power separate.",
-        chips: ["480 V three-phase", "Control transformer", "120 VAC control"],
+        body: "480 V three-phase comes into a knife switch box. From there it feeds the main breaker for the drives, and a step-down transformer to 120 VAC that runs through amp-rated breakers to the logic side. A second transformer gives the ControlLogix clean power, and a terminal strip carries the neutrals and small loads — drive power and control power stay separate.",
+        chips: [
+          "Knife switch",
+          "Main breaker",
+          "Step-down transformer",
+          "Clean PLC power",
+        ],
       },
       {
         title: "E-stop circuit",
