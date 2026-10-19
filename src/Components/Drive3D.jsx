@@ -53,7 +53,7 @@ export default function Drive3D({ reducedMotion }) {
   return (
     <Canvas
       camera={{ position: [0, 0.6, 7.4], fov: 27 }}
-      dpr={[1, 2]}
+      dpr={[1, 1.5]}
       gl={{ antialias: true, powerPreference: "low-power" }}
       style={{ touchAction: "pan-y" }}
     >

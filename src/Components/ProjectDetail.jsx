@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ICONS } from "../icons";
 import { PROJECT_REGISTRY } from "../projectRegistry";
 import SchematicDiagram from "./SchematicDiagram";
+import ProjectModel from "./ProjectModel";
 
 const PROJECTS = Object.values(PROJECT_REGISTRY).filter(
   (p) => p.type === "PROJECT" && p.slug,
@@ -9,7 +10,9 @@ const PROJECTS = Object.values(PROJECT_REGISTRY).filter(
 
 function Label({ icon, children, className = "text-text-dim" }) {
   return (
-    <h2 className={`font-mono text-xs uppercase tracking-[0.1em] flex items-center gap-2 ${className}`}>
+    <h2
+      className={`font-mono text-xs uppercase tracking-[0.1em] flex items-center gap-2 ${className}`}
+    >
       {icon && <FontAwesomeIcon icon={icon} aria-hidden="true" />}
       {children}
     </h2>
@@ -38,7 +41,9 @@ function FaultLog({ log }) {
                 <span className="shrink-0 w-8 h-8 rounded-full border border-status-info/40 bg-status-info/10 text-status-info font-mono text-xs flex items-center justify-center">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <span className="leading-relaxed text-text-primary/90 pt-1">{step}</span>
+                <span className="leading-relaxed text-text-primary/90 pt-1">
+                  {step}
+                </span>
               </li>
             ))}
           </ol>
@@ -48,7 +53,9 @@ function FaultLog({ log }) {
           <div className="font-mono text-[11px] uppercase tracking-wider text-status-warn mb-2">
             Root cause
           </div>
-          <p className="leading-relaxed text-text-primary/90">{log.rootCause}</p>
+          <p className="leading-relaxed text-text-primary/90">
+            {log.rootCause}
+          </p>
         </div>
 
         <div className="p-5 bg-status-ok/5">
@@ -62,12 +69,70 @@ function FaultLog({ log }) {
   );
 }
 
+function BuildSections({ sections }) {
+  return (
+    <section className="flex flex-col gap-4">
+      <Label icon={ICONS.tag}>How it's built</Label>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {sections.map((sec, i) => (
+          <div
+            key={sec.title}
+            className="flex flex-col gap-3 p-5 rounded-xl border border-hmi-border bg-hmi-panel"
+          >
+            <div className="flex items-center gap-3">
+              <span className="shrink-0 w-8 h-8 rounded-full border border-brand/40 bg-brand/10 text-brand font-mono text-xs flex items-center justify-center">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <h3 className="text-lg font-semibold">{sec.title}</h3>
+            </div>
+            <p className="leading-relaxed text-text-muted">{sec.body}</p>
+            {sec.chips && (
+              <ul className="flex flex-wrap gap-1.5 mt-auto pt-1">
+                {sec.chips.map((c) => (
+                  <li
+                    key={c}
+                    className="font-mono text-[11px] uppercase px-2 py-[3px] rounded bg-hmi-surface text-text-muted"
+                  >
+                    {c}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function Roadmap({ items }) {
+  return (
+    <section className="grid-paper p-6 rounded-xl border border-dashed border-hmi-divider bg-[#10151a] flex flex-col gap-4">
+      <Label icon={ICONS.arrowRight} className="text-brand">
+        What's next
+      </Label>
+      <ul className="flex flex-col gap-3">
+        {items.map((item) => (
+          <li key={item} className="flex gap-3 items-start">
+            <span className="mt-2 w-1.5 h-1.5 shrink-0 rounded-full bg-brand" />
+            <span className="leading-relaxed text-text-primary/90">{item}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 export default function ProjectDetail({ projectKey, data }) {
   const index = PROJECTS.findIndex((p) => p === data);
-  const next = PROJECTS.length > 1 ? PROJECTS[(index + 1) % PROJECTS.length] : null;
+  const next =
+    PROJECTS.length > 1 ? PROJECTS[(index + 1) % PROJECTS.length] : null;
 
   return (
-    <article className="flex flex-col gap-12 pt-8" aria-labelledby={`${projectKey}-title`}>
+    <article
+      className="flex flex-col gap-12 pt-8"
+      aria-labelledby={`${projectKey}-title`}
+    >
       <a
         href="#projects"
         className="self-start inline-flex items-center gap-2 min-h-11 text-sm text-text-muted hover:text-text-primary"
@@ -87,16 +152,29 @@ export default function ProjectDetail({ projectKey, data }) {
             {data.status}
           </span>
         </div>
-        <h1 id={`${projectKey}-title`} className="text-3xl md:text-5xl font-bold tracking-tight leading-[1.1] max-w-4xl">
+        <h1
+          id={`${projectKey}-title`}
+          className="text-3xl md:text-5xl font-bold tracking-tight leading-[1.1] max-w-4xl"
+        >
           {data.title}
         </h1>
         <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-text-muted">
+          {data.location && (
+            <span className="flex items-center gap-2">
+              <FontAwesomeIcon
+                icon={ICONS.location}
+                className="text-text-dim"
+                aria-hidden="true"
+              />
+              {data.location}
+            </span>
+          )}
           <span className="flex items-center gap-2">
-            <FontAwesomeIcon icon={ICONS.location} className="text-text-dim" aria-hidden="true" />
-            {data.location}
-          </span>
-          <span className="flex items-center gap-2">
-            <FontAwesomeIcon icon={ICONS.registerDelta} className="text-text-dim" aria-hidden="true" />
+            <FontAwesomeIcon
+              icon={ICONS.registerDelta}
+              className="text-text-dim"
+              aria-hidden="true"
+            />
             {data.metric}
           </span>
         </div>
@@ -113,19 +191,31 @@ export default function ProjectDetail({ projectKey, data }) {
       {/* Before / after */}
       {data.beforeAfter && (
         <section className="flex flex-col gap-4">
-          <Label icon={ICONS.registerDelta}>Result · {data.beforeAfter.label}</Label>
+          <Label icon={ICONS.registerDelta}>
+            Result · {data.beforeAfter.label}
+          </Label>
           <div className="flex flex-col sm:flex-row items-stretch gap-3">
             <div className="flex-1 p-5 rounded-xl border border-hmi-border bg-hmi-panel">
-              <div className="font-mono text-[11px] uppercase tracking-wider text-text-dim mb-1.5">Before</div>
+              <div className="font-mono text-[11px] uppercase tracking-wider text-text-dim mb-1.5">
+                Before
+              </div>
               <div className="text-lg md:text-xl font-semibold text-status-alarm">
                 {data.beforeAfter.before}
               </div>
             </div>
-            <div className="flex items-center justify-center text-text-dim px-1" aria-hidden="true">
-              <FontAwesomeIcon icon={ICONS.arrowRight} className="rotate-90 sm:rotate-0" />
+            <div
+              className="flex items-center justify-center text-text-dim px-1"
+              aria-hidden="true"
+            >
+              <FontAwesomeIcon
+                icon={ICONS.arrowRight}
+                className="rotate-90 sm:rotate-0"
+              />
             </div>
             <div className="flex-1 p-5 rounded-xl border border-status-ok/30 bg-hmi-panel">
-              <div className="font-mono text-[11px] uppercase tracking-wider text-text-dim mb-1.5">After</div>
+              <div className="font-mono text-[11px] uppercase tracking-wider text-text-dim mb-1.5">
+                After
+              </div>
               <div className="text-lg md:text-xl font-semibold text-status-ok">
                 {data.beforeAfter.after}
               </div>
@@ -134,14 +224,22 @@ export default function ProjectDetail({ projectKey, data }) {
         </section>
       )}
 
+      {data.model3d && <ProjectModel model={data.model3d} />}
+
       {data.diagramType && <SchematicDiagram diagramType={data.diagramType} />}
+
+      {data.build && <BuildSections sections={data.build} />}
+
+      {data.roadmap && <Roadmap items={data.roadmap} />}
 
       {data.faultLog && <FaultLog log={data.faultLog} />}
 
       {/* Field notes */}
       {data.fieldNotes && (
         <section className="grid-paper p-6 rounded-xl border border-hmi-border bg-[#10151a] flex flex-col gap-3">
-          <Label icon={ICONS.fieldLog} className="text-brand">Field notes</Label>
+          <Label icon={ICONS.fieldLog} className="text-brand">
+            Field notes
+          </Label>
           <p className="text-base md:text-lg leading-relaxed text-text-primary/90">
             {data.fieldNotes}
           </p>
@@ -169,8 +267,12 @@ export default function ProjectDetail({ projectKey, data }) {
           className="group flex items-center justify-between gap-4 p-6 rounded-xl border border-hmi-border bg-hmi-panel hover:border-hmi-divider transition-colors"
         >
           <span className="flex flex-col gap-1">
-            <span className="font-mono text-xs uppercase tracking-[0.1em] text-text-dim">Next project</span>
-            <span className="text-lg font-semibold text-text-primary">{next.cardTitle}</span>
+            <span className="font-mono text-xs uppercase tracking-[0.1em] text-text-dim">
+              Next project
+            </span>
+            <span className="text-lg font-semibold text-text-primary">
+              {next.cardTitle}
+            </span>
           </span>
           <FontAwesomeIcon
             icon={ICONS.arrowRight}

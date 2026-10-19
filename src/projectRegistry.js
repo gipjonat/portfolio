@@ -35,6 +35,62 @@ export const PROJECT_REGISTRY = {
     targetRole:
       "Actively pursuing full-time Controls Engineering and Systems Integration roles. The goal is permanent ownership of automation architecture: designing it, commissioning it, and being the person who actually understands why it works.",
   },
+  VFD_TEST_BENCH: {
+    id: "SYS-06",
+    type: "PROJECT",
+    title:
+      "VFD Test Bench — Cabinet Design, Safety Circuit & Automated Drive Testing",
+    slug: "vfd-test-bench",
+    cardTitle: "VFD test bench: designed and built from scratch",
+    summary:
+      "A full test cabinet I designed, wired and programmed. A new PowerFlex 525 plugs in, picks up its configuration automatically through ADC, and gets checked for correct output voltage before it ever goes into service.",
+    category: "Panel build",
+    cardStack: "PowerFlex 525 · Studio 5000 · ADC",
+    status: "OPERATIONAL",
+    statusColor: "text-status-ok bg-status-ok/10 border-status-ok/20",
+    metric: "New drives proven out before they go into service",
+    description:
+      "A fully built test cabinet for proving out PowerFlex 525 VFDs before they're installed — the electrical design, wiring, safety circuit and PLC logic are all my own work. Three-phase power feeds the drive side of the panel, and a control transformer steps it down to 120 VAC for the logic side. A new drive connects, receives its configuration automatically through Automatic Device Configuration (ADC), and the logic runs it to confirm it puts out voltage correctly. Built entirely on Allen-Bradley hardware and software, and designed to grow into a bench for testing other PLC components.",
+    diagramType: "TEST_BENCH",
+    model3d: "POWERFLEX_525",
+    build: [
+      {
+        title: "Power distribution",
+        body: "Brought three-phase power into the cabinet for the drive side, then stepped it down through a control transformer to 120 VAC for the logic side — keeping drive power and control power separate.",
+        chips: ["Three-phase", "Control transformer", "120 VAC control"],
+      },
+      {
+        title: "Safety circuit",
+        body: "Designed and wired my own safety circuit for the PowerFlex 525 under test, so drives can be powered and run on the bench safely.",
+        chips: ["Safety circuit design", "Panel wiring"],
+      },
+      {
+        title: "Automatic Device Configuration",
+        body: "The controller holds the drive's configuration and, through ADC over EtherNet/IP, downloads it to a fresh unit automatically — a new VFD is ready to test without hand-entering parameters.",
+        chips: ["Studio 5000", "ADC", "EtherNet/IP"],
+      },
+      {
+        title: "Output verification",
+        body: "Logic runs each drive and checks that it puts out voltage correctly, so a bad unit gets caught on the bench instead of after it's installed.",
+        chips: ["Ladder logic", "Drive testing"],
+      },
+    ],
+    roadmap: [
+      "Extend the same plug-in-and-test workflow to Logix controllers",
+      "Add testing for input and output cards",
+      "Grow it into a general-purpose test station for PLC components",
+    ],
+    tags: [
+      "Electrical Design",
+      "Panel Build",
+      "Safety Circuit",
+      "PowerFlex 525",
+      "Studio 5000",
+      "ADC",
+      "EtherNet/IP",
+      "Three-Phase Power",
+    ],
+  },
   CALJAN_REWIRE: {
     id: "SYS-01",
     type: "PROJECT",

@@ -54,15 +54,7 @@ export const RACK_CREDIT = {
   url: "https://grabcad.com/library/allen-bradley-controllogix-plc",
 };
 
-// The "PowerFlex 525" tab of the hero viewer.
-export const DRIVE_INFO = {
-  part: "PowerFlex 525",
-  name: "AC drive",
-  blurb: "VFD diagnostics: fault codes, parameters and the speed references the PLC sends them.",
-  href: "#skills",
-  linkLabel: "See drive & controls skills",
-};
-
+// PowerFlex 525 model — shown on the VFD test bench project page.
 // Required by the model's CC BY license. Add the Sketchfab page as `url`
 // to link the title.
 export const DRIVE_CREDIT = {
