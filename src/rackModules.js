@@ -53,3 +53,22 @@ export const RACK_CREDIT = {
   text: "Module geometry: “Allen bradley Controllogix PLC” by 3DGEN on GrabCAD",
   url: "https://grabcad.com/library/allen-bradley-controllogix-plc",
 };
+
+// The "PowerFlex 525" tab of the hero viewer.
+export const DRIVE_INFO = {
+  part: "PowerFlex 525",
+  name: "AC drive",
+  blurb: "VFD diagnostics: fault codes, parameters and the speed references the PLC sends them.",
+  href: "#skills",
+  linkLabel: "See drive & controls skills",
+};
+
+// Required by the model's CC BY license. Add the Sketchfab page as `url`
+// to link the title.
+export const DRIVE_CREDIT = {
+  title: "PowerFlex 525",
+  author: "Aquent Studios at Rockwell Automation",
+  url: null,
+  license: "CC BY 4.0",
+  licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
+};
