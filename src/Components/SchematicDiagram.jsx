@@ -1718,24 +1718,27 @@ function BenchArrow({ x, y, dir = "right", color }) {
     right: `M ${x - 7} ${y - 4} L ${x} ${y} L ${x - 7} ${y + 4} Z`,
     down: `M ${x - 4} ${y - 7} L ${x} ${y} L ${x + 4} ${y - 7} Z`,
     up: `M ${x - 4} ${y + 7} L ${x} ${y} L ${x + 4} ${y + 7} Z`,
+    left: `M ${x + 7} ${y - 4} L ${x} ${y} L ${x + 7} ${y + 4} Z`,
   }[dir];
   return <path d={d} fill={color} />;
 }
 
 function TestBenchDiagram() {
-  // System overview of the VFD test bench. Power side on top (three-phase
-  // to the drive under test), logic side below (120 VAC via the control
-  // transformer), with the EtherNet/IP + ADC link and the safety circuit
-  // tying them together. Roadmap items are drawn dashed.
+  // Power & control one-line for the VFD test bench.
+  // 480 V three-phase -> knife switch box. One branch goes through the main
+  // breaker to the drives under test; the other goes through the step-down
+  // transformer to the 120 VAC branch breakers, which feed the logic side
+  // (transformer 2 for clean PLC power, the E-stop safety contactor, and the
+  // neutral / small-power terminal strip).
   return (
     <svg
-      viewBox="0 0 760 420"
+      viewBox="0 0 760 470"
       className="w-full h-auto min-w-[560px]"
       role="img"
-      aria-label="VFD test bench system diagram: 480 V three-phase supply to the drive under test, control transformer to the 120 VAC logic side, ControlLogix linked to the drive over EtherNet/IP for ADC and running the test, and an E-stop safety contactor breaking the drive's 24 VDC stop loop"
+      aria-label="VFD test bench power and control diagram: 480 V three-phase into a knife switch box, through the main breaker to the PowerFlex 525 drives under test, and through a step-down transformer to 120 VAC branch breakers feeding a clean-power transformer for the ControlLogix, the E-stop safety contactor and a neutral terminal strip. The ControlLogix runs the drives over EtherNet/IP with ADC, and the safety contactor breaks the drives' 24 VDC stop loop."
       fontFamily="var(--font-mono)"
     >
-      <title>VFD test bench — system overview</title>
+      <title>VFD test bench — power and control</title>
 
       {/* Legend */}
       <g fontSize="9" fill={BENCH.muted}>
@@ -1748,152 +1751,180 @@ function TestBenchDiagram() {
           strokeWidth="3"
         />
         <text x="54" y="21">
-          Three-phase power
+          480 V three-phase
         </text>
         <line
-          x1="170"
+          x1="180"
           y1="18"
-          x2="194"
+          x2="204"
           y2="18"
           stroke={BENCH.control}
           strokeWidth="2"
         />
-        <text x="200" y="21">
+        <text x="210" y="21">
           120 VAC control
         </text>
         <line
-          x1="308"
+          x1="322"
           y1="18"
-          x2="332"
+          x2="346"
           y2="18"
           stroke={BENCH.comms}
           strokeWidth="2"
           strokeDasharray="5 4"
         />
-        <text x="338" y="21">
+        <text x="352" y="21">
           EtherNet/IP
         </text>
         <line
-          x1="428"
+          x1="444"
           y1="18"
-          x2="452"
+          x2="468"
           y2="18"
           stroke={BENCH.safety}
           strokeWidth="2"
         />
-        <text x="458" y="21">
+        <text x="474" y="21">
           E-stop loop
-        </text>
-        <rect
-          x="560"
-          y="12"
-          width="22"
-          height="12"
-          rx="2"
-          fill="none"
-          stroke={BENCH.edge}
-          strokeDasharray="4 3"
-        />
-        <text x="588" y="21">
-          Planned
         </text>
       </g>
 
-      {/* Section labels */}
-      <text
-        x="24"
-        y="58"
-        fontSize="9"
-        fontWeight="700"
-        letterSpacing="1.5"
-        fill={BENCH.power}
-      >
-        POWER SIDE
-      </text>
-
-      {/* Power path */}
+      {/* ── Power side ── */}
       <BenchBlock
-        x={24}
-        y={68}
-        w={130}
+        x={16}
+        y={60}
+        w={110}
         h={50}
         title="3Ø 480 V"
-        sub="Into the cabinet"
+        sub="Supply"
         stroke={BENCH.power}
       />
       <line
-        x1="154"
-        y1="93"
-        x2="292"
-        y2="93"
+        x1="126"
+        y1="85"
+        x2="152"
+        y2="85"
         stroke={BENCH.power}
         strokeWidth="3"
       />
-      <BenchArrow x={300} y={93} color={BENCH.power} />
+      <BenchArrow x={160} y={85} color={BENCH.power} />
       <BenchBlock
-        x={300}
+        x={160}
         y={60}
-        w={190}
-        h={66}
-        title="POWERFLEX 525"
-        sub="Drive under test"
+        w={120}
+        h={50}
+        title="KNIFE SWITCH"
+        sub="Disconnect box"
+        stroke={BENCH.power}
+      />
+      <line
+        x1="280"
+        y1="85"
+        x2="306"
+        y2="85"
+        stroke={BENCH.power}
+        strokeWidth="3"
+      />
+      <BenchArrow x={314} y={85} color={BENCH.power} />
+      <BenchBlock
+        x={314}
+        y={60}
+        w={116}
+        h={50}
+        title="MAIN BREAKER"
+        sub="Drive feed"
+        stroke={BENCH.power}
+      />
+      <line
+        x1="430"
+        y1="85"
+        x2="450"
+        y2="85"
+        stroke={BENCH.power}
+        strokeWidth="3"
+      />
+      <BenchArrow x={458} y={85} color={BENCH.power} />
+      <BenchBlock
+        x={458}
+        y={56}
+        w={156}
+        h={58}
+        title="POWERFLEX 525s"
+        sub="Drives under test"
         stroke={BENCH.power}
         titleColor="var(--color-brand)"
       />
       <line
-        x1="490"
-        y1="93"
-        x2="552"
-        y2="93"
+        x1="614"
+        y1="85"
+        x2="630"
+        y2="85"
         stroke={BENCH.power}
         strokeWidth="3"
       />
-      <BenchArrow x={560} y={93} color={BENCH.power} />
+      <BenchArrow x={638} y={85} color={BENCH.power} />
       <BenchBlock
-        x={560}
-        y={68}
-        w={176}
+        x={638}
+        y={60}
+        w={110}
         h={50}
-        title="OUTPUT CHECK"
-        sub="Verified over EtherNet/IP"
-        stroke="var(--color-status-ok)"
+        title="OUTPUT"
+        sub="Voltage checked"
+        stroke={BENCH.safety}
       />
 
-      {/* Transformer branch */}
+      {/* Step-down branch */}
       <line
-        x1="89"
-        y1="118"
-        x2="89"
-        y2="172"
+        x1="220"
+        y1="110"
+        x2="220"
+        y2="142"
         stroke={BENCH.power}
         strokeWidth="3"
       />
-      <BenchArrow x={89} y={180} dir="down" color={BENCH.power} />
+      <BenchArrow x={220} y={150} dir="down" color={BENCH.power} />
       <BenchBlock
-        x={24}
-        y={180}
-        w={150}
+        x={160}
+        y={150}
+        w={120}
         h={50}
-        title="CONTROL XFMR"
+        title="STEP-DOWN"
         sub="480 V → 120 VAC"
         stroke={BENCH.control}
       />
       <line
-        x1="99"
-        y1="230"
-        x2="99"
-        y2="276"
+        x1="220"
+        y1="200"
+        x2="220"
+        y2="226"
         stroke={BENCH.control}
         strokeWidth="2"
       />
-      <BenchArrow x={99} y={284} dir="down" color={BENCH.control} />
+      <BenchArrow x={220} y={234} dir="down" color={BENCH.control} />
+      <BenchBlock
+        x={160}
+        y={234}
+        w={120}
+        h={50}
+        title="BREAKERS"
+        sub="120 VAC branches"
+        stroke={BENCH.control}
+      />
+      <line
+        x1="220"
+        y1="284"
+        x2="220"
+        y2="318"
+        stroke={BENCH.control}
+        strokeWidth="2"
+      />
 
-      {/* Logic side enclosure */}
+      {/* ── Logic side ── */}
       <rect
         x="16"
-        y="262"
-        width="490"
-        height="142"
+        y="300"
+        width="732"
+        height="160"
         rx="10"
         fill="none"
         stroke={BENCH.control}
@@ -1902,7 +1933,7 @@ function TestBenchDiagram() {
       />
       <text
         x="30"
-        y="396"
+        y="450"
         fontSize="9"
         fontWeight="700"
         letterSpacing="1.5"
@@ -1911,110 +1942,487 @@ function TestBenchDiagram() {
         LOGIC SIDE · 120 VAC
       </text>
 
+      {/* 120 VAC bus and drops */}
+      <line
+        x1="95"
+        y1="318"
+        x2="610"
+        y2="318"
+        stroke={BENCH.control}
+        strokeWidth="2"
+      />
+      <line
+        x1="95"
+        y1="318"
+        x2="95"
+        y2="334"
+        stroke={BENCH.control}
+        strokeWidth="2"
+      />
+      <BenchArrow x={95} y={342} dir="down" color={BENCH.control} />
+      <line
+        x1="430"
+        y1="318"
+        x2="430"
+        y2="334"
+        stroke={BENCH.control}
+        strokeWidth="2"
+      />
+      <BenchArrow x={430} y={342} dir="down" color={BENCH.control} />
+      <line
+        x1="610"
+        y1="318"
+        x2="610"
+        y2="334"
+        stroke={BENCH.control}
+        strokeWidth="2"
+      />
+      <BenchArrow x={610} y={342} dir="down" color={BENCH.control} />
+
       <BenchBlock
-        x={36}
-        y={284}
-        w={190}
-        h={64}
+        x={30}
+        y={342}
+        w={130}
+        h={56}
+        title="XFMR 2"
+        sub="Clean PLC power"
+        stroke={BENCH.control}
+      />
+      <line
+        x1="160"
+        y1="370"
+        x2="182"
+        y2="370"
+        stroke={BENCH.control}
+        strokeWidth="2"
+      />
+      <BenchArrow x={190} y={370} color={BENCH.control} />
+      <BenchBlock
+        x={190}
+        y={342}
+        w={146}
+        h={56}
         title="CONTROLLOGIX"
         sub="Studio 5000 logic"
         stroke={BENCH.comms}
       />
       <BenchBlock
-        x={286}
-        y={284}
-        w={190}
-        h={64}
+        x={356}
+        y={342}
+        w={150}
+        h={56}
         title="E-STOP CIRCUIT"
-        sub="Safety contactor · 120 V coil"
+        sub="Safety contactor"
         stroke={BENCH.safety}
       />
-      <line
-        x1="226"
-        y1="316"
-        x2="286"
-        y2="316"
+      <BenchBlock
+        x={536}
+        y={342}
+        w={148}
+        h={56}
+        title="TERMINAL STRIP"
+        sub="Neutrals · small loads"
         stroke={BENCH.control}
-        strokeWidth="2"
       />
 
-      {/* EtherNet/IP + ADC: controller <-> drive */}
+      {/* EtherNet/IP + ADC: ControlLogix -> drives */}
       <path
-        d="M 200 284 L 200 210 L 340 210 L 340 134"
+        d="M 300 342 L 300 236 L 470 236 L 470 121"
         fill="none"
         stroke={BENCH.comms}
         strokeWidth="2"
         strokeDasharray="6 4"
       />
-      <BenchArrow x={340} y={127} dir="up" color={BENCH.comms} />
+      <BenchArrow x={470} y={114} dir="up" color={BENCH.comms} />
       <rect
-        x="198"
-        y="191"
-        width="134"
-        height="17"
+        x="306"
+        y="216"
+        width="128"
+        height="16"
         rx="3"
         fill="var(--color-hmi-bg)"
       />
-      <text x="265" y="203" textAnchor="middle" fontSize="9" fill={BENCH.comms}>
+      <text x="370" y="228" textAnchor="middle" fontSize="9" fill={BENCH.comms}>
         EtherNet/IP · ADC + run
       </text>
 
-      {/* E-stop loop: the drive's own 24 VDC goes out through the safety
-          contactor's N.O. contact and back into the drive. E-stop drops the
-          coil, the contact opens, the loop breaks and the drive stops. */}
+      {/* E-stop loop: drive's 24 VDC out through the contactor's N.O.
+          contact and back into the drive */}
       <line
-        x1="428"
-        y1="134"
-        x2="428"
-        y2="277"
+        x1="488"
+        y1="121"
+        x2="488"
+        y2="335"
         stroke={BENCH.safety}
         strokeWidth="2"
       />
-      <BenchArrow x={428} y={284} dir="down" color={BENCH.safety} />
+      <BenchArrow x={488} y={342} dir="down" color={BENCH.safety} />
       <line
-        x1="452"
-        y1="284"
-        x2="452"
-        y2="134"
+        x1="500"
+        y1="342"
+        x2="500"
+        y2="121"
         stroke={BENCH.safety}
         strokeWidth="2"
       />
-      <BenchArrow x={452} y={127} dir="up" color={BENCH.safety} />
-      <text x="460" y="204" fontSize="9" fill={BENCH.safety}>
+      <BenchArrow x={500} y={114} dir="up" color={BENCH.safety} />
+      <rect
+        x="508"
+        y="188"
+        width="70"
+        height="30"
+        rx="3"
+        fill="var(--color-hmi-bg)"
+      />
+      <text x="512" y="200" fontSize="9" fill={BENCH.safety}>
         24 VDC
       </text>
-      <text x="460" y="216" fontSize="9" fill={BENCH.safety}>
+      <text x="512" y="212" fontSize="9" fill={BENCH.safety}>
         stop loop
       </text>
+    </svg>
+  );
+}
 
-      {/* Roadmap */}
+// Maps a point from Jonathon's hand sketch of the cabinet (paint canvas
+// pixels) onto this diagram, so the layout keeps his proportions.
+const SK = { ox: 60, oy: 40, s: 0.378, x0: 93, y0: 95 };
+const skX = (x) => SK.ox + (x - SK.x0) * SK.s;
+const skY = (y) => SK.oy + (y - SK.y0) * SK.s;
+
+function LayoutPart({
+  x1,
+  y1,
+  x2,
+  y2,
+  stroke,
+  fill = BENCH.box,
+  dashed,
+  children,
+}) {
+  const x = skX(x1);
+  const y = skY(y1);
+  return (
+    <g>
+      <rect
+        x={x}
+        y={y}
+        width={skX(x2) - x}
+        height={skY(y2) - y}
+        rx="3"
+        fill={fill}
+        stroke={stroke}
+        strokeWidth="1.5"
+        strokeDasharray={dashed ? "4 3" : undefined}
+      />
+      {children}
+    </g>
+  );
+}
+
+function LayoutLabel({
+  x,
+  y,
+  lines,
+  color = BENCH.text,
+  size = 9,
+  anchor = "middle",
+  rotate,
+}) {
+  return (
+    <text
+      x={x}
+      y={y}
+      textAnchor={anchor}
+      fontSize={size}
+      fontWeight="700"
+      fill={color}
+      transform={rotate ? `rotate(${rotate} ${x} ${y})` : undefined}
+    >
+      {lines.map((l, i) => (
+        <tspan key={l} x={x} dy={i === 0 ? 0 : size + 3}>
+          {l}
+        </tspan>
+      ))}
+    </text>
+  );
+}
+
+function TestBenchLayoutDiagram() {
+  // Front view of the cabinet, redrawn from the builder's own sketch.
+  // Simplified: positions and sizes are approximate.
+  const duct = "#1b2127";
+  const cx = (a, b) => (skX(a) + skX(b)) / 2;
+  const cy = (a, b) => (skY(a) + skY(b)) / 2;
+
+  return (
+    <svg
+      viewBox="0 0 760 425"
+      className="w-full h-auto min-w-[560px]"
+      role="img"
+      aria-label="Simplified panel layout of the VFD test bench: PLC modules, safety contactor, branch breakers and a neutral terminal strip on the left; wire duct around them; VFDs and the main breaker on the right; the knife switch box and step-down transformer outside the cabinet on the right; a second transformer for clean PLC power above the cabinet."
+      fontFamily="var(--font-mono)"
+    >
+      <title>VFD test bench — panel layout (simplified)</title>
+
+      {/* Transformer 2, above the cabinet */}
+      <LayoutPart x1={165} y1={20} x2={487} y2={85} stroke={BENCH.control}>
+        <LayoutLabel
+          x={cx(165, 487)}
+          y={cy(20, 85) + 3}
+          lines={["XFMR 2"]}
+          color={BENCH.control}
+        />
+      </LayoutPart>
+      <LayoutLabel
+        x={skX(487) + 8}
+        y={cy(20, 85) + 3}
+        lines={["Clean power to the PLC"]}
+        anchor="start"
+        size={8}
+        color={BENCH.muted}
+      />
+
+      {/* Cabinet */}
+      <rect
+        x={skX(93)}
+        y={skY(95)}
+        width={skX(1467) - skX(93)}
+        height={skY(962) - skY(95)}
+        rx="6"
+        fill="none"
+        stroke={BENCH.edge}
+        strokeWidth="2.5"
+      />
       <text
-        x="560"
-        y="276"
+        x={skX(93) + 4}
+        y={skY(962) + 16}
         fontSize="9"
         fontWeight="700"
         letterSpacing="1.5"
         fill={BENCH.muted}
       >
-        NEXT ON THE BENCH
+        TEST CABINET
       </text>
-      <BenchBlock
-        x={560}
-        y={288}
-        w={176}
-        h={44}
-        title="CONTROLLER TESTING"
-        dashed
-        titleColor={BENCH.muted}
+
+      {/* Wire duct */}
+      <LayoutPart
+        x1={103}
+        y1={152}
+        x2={133}
+        y2={776}
+        stroke={BENCH.edge}
+        fill={duct}
+      >
+        <LayoutLabel
+          x={cx(103, 133) + 3}
+          y={cy(152, 776)}
+          lines={["WIRE DUCT"]}
+          color={BENCH.muted}
+          size={8}
+          rotate={-90}
+        />
+      </LayoutPart>
+      <LayoutPart
+        x1={110}
+        y1={786}
+        x2={950}
+        y2={886}
+        stroke={BENCH.edge}
+        fill={duct}
+      >
+        <LayoutLabel
+          x={cx(110, 950)}
+          y={cy(786, 886) + 3}
+          lines={["WIRE DUCT"]}
+          color={BENCH.muted}
+          size={8}
+        />
+      </LayoutPart>
+      <LayoutPart
+        x1={970}
+        y1={148}
+        x2={1100}
+        y2={891}
+        stroke={BENCH.edge}
+        fill={duct}
+      >
+        <LayoutLabel
+          x={cx(970, 1100) + 3}
+          y={cy(148, 891)}
+          lines={["WIRE DUCT"]}
+          color={BENCH.muted}
+          size={8}
+          rotate={-90}
+        />
+      </LayoutPart>
+
+      {/* Neutral / small-power terminal strip */}
+      <LayoutPart x1={150} y1={168} x2={196} y2={551} stroke={BENCH.control}>
+        {Array.from({ length: 12 }, (_, i) => (
+          <line
+            key={i}
+            x1={skX(150) + 2}
+            x2={skX(196) - 2}
+            y1={skY(168) + 8 + i * 11}
+            y2={skY(168) + 8 + i * 11}
+            stroke={BENCH.control}
+            strokeOpacity="0.5"
+          />
+        ))}
+      </LayoutPart>
+      <LayoutLabel
+        x={skX(196) + 6}
+        y={skY(420)}
+        lines={["NEUTRALS /", "SMALL POWER"]}
+        anchor="start"
+        size={8}
+        color={BENCH.control}
       />
-      <BenchBlock
-        x={560}
-        y={344}
-        w={176}
-        h={44}
-        title="I/O CARD TESTING"
+
+      {/* PLC modules */}
+      <LayoutPart x1={277} y1={177} x2={585} y2={267} stroke={BENCH.comms}>
+        {Array.from({ length: 7 }, (_, i) => (
+          <rect
+            key={i}
+            x={skX(285) + i * 16}
+            y={skY(185)}
+            width="12"
+            height={skY(259) - skY(185)}
+            rx="1"
+            fill="none"
+            stroke={BENCH.comms}
+            strokeOpacity="0.55"
+          />
+        ))}
+      </LayoutPart>
+      <LayoutLabel
+        x={skX(585) + 8}
+        y={cy(177, 267) + 3}
+        lines={["CONTROLLOGIX"]}
+        anchor="start"
+        color={BENCH.comms}
+      />
+
+      {/* Safety contactor */}
+      <LayoutPart x1={303} y1={520} x2={505} y2={603} stroke={BENCH.safety}>
+        <LayoutLabel
+          x={cx(303, 505)}
+          y={cy(520, 603) - 2}
+          lines={["SAFETY", "CONTACTOR"]}
+          color={BENCH.safety}
+          size={8}
+        />
+      </LayoutPart>
+
+      {/* Branch breakers */}
+      <LayoutLabel
+        x={cx(277, 485)}
+        y={skY(727) - 6}
+        lines={["BREAKERS · 120 VAC"]}
+        color={BENCH.control}
+        size={8}
+      />
+      <LayoutPart x1={277} y1={727} x2={485} y2={755} stroke={BENCH.control}>
+        {Array.from({ length: 8 }, (_, i) => (
+          <line
+            key={i}
+            x1={skX(277) + 9 + i * 9.5}
+            x2={skX(277) + 9 + i * 9.5}
+            y1={skY(727) + 2}
+            y2={skY(755) - 2}
+            stroke={BENCH.control}
+            strokeOpacity="0.6"
+          />
+        ))}
+      </LayoutPart>
+
+      {/* Unlabeled component above the drives */}
+      <LayoutPart
+        x1={1130}
+        y1={348}
+        x2={1380}
+        y2={461}
+        stroke={BENCH.edge}
         dashed
-        titleColor={BENCH.muted}
+      />
+
+      {/* VFDs */}
+      <LayoutPart x1={1132} y1={487} x2={1380} y2={734} stroke={BENCH.power}>
+        {[0, 1, 2].map((i) => (
+          <g key={i}>
+            <rect
+              x={skX(1145) + i * 30}
+              y={skY(500)}
+              width="24"
+              height={skY(680) - skY(500)}
+              rx="2"
+              fill="none"
+              stroke="var(--color-brand)"
+              strokeOpacity="0.8"
+            />
+            <rect
+              x={skX(1145) + i * 30 + 5}
+              y={skY(512)}
+              width="14"
+              height="5"
+              fill="var(--color-status-ok)"
+              opacity="0.7"
+            />
+          </g>
+        ))}
+      </LayoutPart>
+      <LayoutLabel
+        x={cx(1132, 1380)}
+        y={skY(722)}
+        lines={["POWERFLEX 525s"]}
+        size={8}
+        color="var(--color-brand)"
+      />
+
+      {/* Main breaker */}
+      <LayoutPart x1={1270} y1={753} x2={1362} y2={901} stroke={BENCH.power} />
+      <LayoutLabel
+        x={cx(1270, 1362)}
+        y={skY(901) + 12}
+        lines={["MAIN BREAKER"]}
+        color={BENCH.power}
+        size={8}
+      />
+
+      {/* Knife switch box + step-down transformer, outside the cabinet */}
+      <LayoutPart x1={1488} y1={280} x2={1722} y2={963} stroke={BENCH.power}>
+        <LayoutLabel
+          x={cx(1488, 1722)}
+          y={skY(520)}
+          lines={["KNIFE", "SWITCH", "BOX", "", "3Ø 480 V IN"]}
+          color={BENCH.power}
+        />
+      </LayoutPart>
+      <LayoutPart x1={1495} y1={979} x2={1720} y2={1070} stroke={BENCH.control}>
+        <LayoutLabel
+          x={cx(1495, 1720)}
+          y={cy(979, 1070) - 3}
+          lines={["STEP-DOWN", "480 → 120 VAC"]}
+          color={BENCH.control}
+          size={8}
+        />
+      </LayoutPart>
+
+      {/* Feeds into the cabinet */}
+      <line
+        x1={skX(1488)}
+        y1={skY(830)}
+        x2={skX(1362) + 10}
+        y2={skY(830)}
+        stroke={BENCH.power}
+        strokeWidth="3"
+      />
+      <BenchArrow
+        x={skX(1362) + 2}
+        y={skY(830)}
+        dir="left"
+        color={BENCH.power}
       />
     </svg>
   );
@@ -2026,11 +2434,13 @@ const DIAGRAM_COMPONENTS = {
   EXTENDO_CONVEYOR: ExtendoConveyorDiagram,
   SORTER_BELT_LAYOUT: SorterBeltLayoutDiagram,
   TEST_BENCH: TestBenchDiagram,
+  TEST_BENCH_LAYOUT: TestBenchLayoutDiagram,
 };
 
 // Section heading per diagram; anything not listed uses the default.
 const DIAGRAM_TITLES = {
-  TEST_BENCH: "System Diagram",
+  TEST_BENCH: "Power & Control",
+  TEST_BENCH_LAYOUT: "Panel Layout (simplified)",
 };
 
 export default function SchematicDiagram({ diagramType }) {
