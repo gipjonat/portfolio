@@ -1,11 +1,5 @@
 import { Component, Suspense, lazy, useEffect, useState } from "react";
-import {
-  RACK_MODULES,
-  DEFAULT_MODULE,
-  RACK_CREDIT,
-  DRIVE_INFO,
-  DRIVE_CREDIT,
-} from "../rackModules";
+import { RACK_MODULES, DEFAULT_MODULE, RACK_CREDIT } from "../rackModules";
 
 // Hero rack: a real 3D ControlLogix chassis (React Three Fiber), loaded
 // lazily. While it loads — or if the device has no WebGL — a flat CSS
@@ -13,12 +7,6 @@ import {
 // the info panel and the module buttons below, which also make the rack
 // usable by keyboard and touch.
 const Rack3D = lazy(() => import("./Rack3D"));
-const Drive3D = lazy(() => import("./Drive3D"));
-
-const VIEWS = [
-  { id: "rack", label: "ControlLogix" },
-  { id: "drive", label: "PowerFlex 525" },
-];
 
 function hasWebGL() {
   try {
@@ -93,13 +81,9 @@ function FlatRack({ active, setActive }) {
 
 export default function ChassisViewer() {
   const [active, setActive] = useState(DEFAULT_MODULE);
-  const [view, setView] = useState("rack");
   const [webgl] = useState(hasWebGL);
   const reducedMotion = usePrefersReducedMotion();
-  const isDrive = view === "drive";
-  const current = isDrive
-    ? DRIVE_INFO
-    : RACK_MODULES.find((m) => m.id === active);
+  const current = RACK_MODULES.find((m) => m.id === active);
 
   const go = (id) => {
     const m = RACK_MODULES.find((x) => x.id === id);
@@ -110,33 +94,8 @@ export default function ChassisViewer() {
 
   return (
     <div className="grid-paper relative flex flex-col rounded-2xl border border-hmi-border bg-[#10151a] overflow-hidden">
-      <div className="flex items-center justify-between gap-3 px-3 pt-3 font-mono text-[11px] tracking-[0.08em] uppercase">
-        {webgl ? (
-          <div
-            role="tablist"
-            aria-label="3D model"
-            className="flex gap-1 p-1 rounded-lg bg-hmi-bg/80 border border-hmi-border"
-          >
-            {VIEWS.map((v) => (
-              <button
-                key={v.id}
-                type="button"
-                role="tab"
-                aria-selected={view === v.id}
-                onClick={() => setView(v.id)}
-                className={`min-h-8 px-2.5 rounded-md uppercase tracking-[0.06em] transition-colors ${
-                  view === v.id
-                    ? "bg-hmi-surface text-accent-soft"
-                    : "text-text-dim hover:text-text-primary"
-                }`}
-              >
-                {v.label}
-              </button>
-            ))}
-          </div>
-        ) : (
-          <span className="px-1 text-text-dim">Rack 0 · ControlLogix</span>
-        )}
+      <div className="flex items-center justify-between gap-3 px-4 pt-3.5 font-mono text-[11px] tracking-[0.08em] uppercase">
+        <span className="px-1 text-text-dim">Rack 0 · ControlLogix</span>
         <span className="flex items-center gap-1.5 text-status-ok">
           <span className="w-[7px] h-[7px] rounded-full bg-status-ok animate-pulse" />
           Run
@@ -153,16 +112,12 @@ export default function ChassisViewer() {
                 </div>
               }
             >
-              {isDrive ? (
-                <Drive3D reducedMotion={reducedMotion} />
-              ) : (
-                <Rack3D
-                  active={active}
-                  onHover={setActive}
-                  onSelect={go}
-                  reducedMotion={reducedMotion}
-                />
-              )}
+              <Rack3D
+                active={active}
+                onHover={setActive}
+                onSelect={go}
+                reducedMotion={reducedMotion}
+              />
             </Suspense>
           </FallbackOnError>
         ) : (
@@ -192,74 +147,36 @@ export default function ChassisViewer() {
       </div>
 
       {/* Module buttons — keyboard / touch access to the same links */}
-      {isDrive ? (
-        <div className="flex justify-center px-4 pb-4">
+      <nav
+        aria-label="Rack modules"
+        className="flex flex-wrap justify-center gap-1.5 px-4 pb-4"
+      >
+        {RACK_MODULES.map((m) => (
           <a
-            href={DRIVE_INFO.href}
-            className="font-mono text-[11px] uppercase px-2.5 py-1.5 rounded border border-hmi-border text-text-dim hover:text-text-primary"
+            key={m.id}
+            href={m.href}
+            onMouseEnter={() => setActive(m.id)}
+            onFocus={() => setActive(m.id)}
+            aria-label={`${m.part} ${m.name}: ${m.blurb}`}
+            className={`font-mono text-[11px] px-2.5 py-1.5 rounded border transition-colors ${
+              m.id === active
+                ? "border-accent text-accent-soft bg-accent/10"
+                : "border-hmi-border text-text-dim hover:text-text-primary"
+            }`}
           >
-            {DRIVE_INFO.linkLabel} →
+            {m.id}
           </a>
-        </div>
-      ) : (
-        <nav
-          aria-label="Rack modules"
-          className="flex flex-wrap justify-center gap-1.5 px-4 pb-4"
-        >
-          {RACK_MODULES.map((m) => (
-            <a
-              key={m.id}
-              href={m.href}
-              onMouseEnter={() => setActive(m.id)}
-              onFocus={() => setActive(m.id)}
-              aria-label={`${m.part} ${m.name}: ${m.blurb}`}
-              className={`font-mono text-[11px] px-2.5 py-1.5 rounded border transition-colors ${
-                m.id === active
-                  ? "border-accent text-accent-soft bg-accent/10"
-                  : "border-hmi-border text-text-dim hover:text-text-primary"
-              }`}
-            >
-              {m.id}
-            </a>
-          ))}
-        </nav>
-      )}
+        ))}
+      </nav>
 
-      {isDrive ? (
-        <p className="px-4 pb-3 text-center text-[10px] text-text-dim">
-          {DRIVE_CREDIT.url ? (
-            <a
-              href={DRIVE_CREDIT.url}
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-text-muted underline-offset-2 hover:underline"
-            >
-              “{DRIVE_CREDIT.title}”
-            </a>
-          ) : (
-            <>“{DRIVE_CREDIT.title}”</>
-          )}{" "}
-          by {DRIVE_CREDIT.author} ·{" "}
-          <a
-            href={DRIVE_CREDIT.licenseUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="hover:text-text-muted underline-offset-2 hover:underline"
-          >
-            {DRIVE_CREDIT.license}
-          </a>{" "}
-          · compressed for the web
-        </p>
-      ) : (
-        <a
-          href={RACK_CREDIT.url}
-          target="_blank"
-          rel="noreferrer"
-          className="px-4 pb-3 text-center text-[10px] text-text-dim hover:text-text-muted"
-        >
-          {RACK_CREDIT.text}
-        </a>
-      )}
+      <a
+        href={RACK_CREDIT.url}
+        target="_blank"
+        rel="noreferrer"
+        className="px-4 pb-3 text-center text-[10px] text-text-dim hover:text-text-muted"
+      >
+        {RACK_CREDIT.text}
+      </a>
     </div>
   );
 }

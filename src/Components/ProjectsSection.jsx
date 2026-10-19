@@ -19,27 +19,49 @@ function Tag({ children, tone = "neutral" }) {
     neutral: "bg-hmi-surface text-text-muted",
   };
   return (
-    <span className={`inline-flex items-center gap-1.5 font-mono text-[11px] uppercase px-2 py-[3px] rounded ${tones[tone]}`}>
+    <span
+      className={`inline-flex items-center gap-1.5 font-mono text-[11px] uppercase px-2 py-[3px] rounded ${tones[tone]}`}
+    >
       {children}
     </span>
   );
 }
 
-function ProjectCard({ project }) {
-  const categoryTone = project.category?.startsWith("PLC") ? "accent" : "alarm";
+// Tag color per project category.
+const CATEGORY_TONE = {
+  "PLC / Studio 5000": "accent",
+  "Panel build": "brand",
+  Troubleshooting: "alarm",
+};
+
+function ProjectCard({ project, featured = false }) {
+  const categoryTone = CATEGORY_TONE[project.category] ?? "neutral";
   return (
     <a
       href={`#/projects/${project.slug}`}
-      className="group flex flex-col rounded-xl border border-hmi-border bg-hmi-panel overflow-hidden text-text-primary transition hover:border-hmi-divider hover:-translate-y-0.5"
+      className={`group flex flex-col rounded-xl border border-hmi-border bg-hmi-panel overflow-hidden text-text-primary transition hover:border-hmi-divider hover:-translate-y-0.5 ${
+        featured ? "lg:col-span-2 lg:flex-row" : ""
+      }`}
     >
-      <ProjectThumb diagramType={project.diagramType} />
-      <div className="flex flex-col gap-2.5 flex-1 p-5">
+      <ProjectThumb
+        diagramType={project.diagramType}
+        className={
+          featured
+            ? "lg:w-1/2 lg:h-auto lg:min-h-[260px] lg:border-b-0 lg:border-r"
+            : ""
+        }
+      />
+      <div
+        className={`flex flex-col gap-2.5 flex-1 p-5 ${featured ? "lg:p-8 lg:justify-center" : ""}`}
+      >
         <div className="flex flex-wrap gap-1.5">
           <Tag tone={categoryTone}>{project.category}</Tag>
-          <Tag tone="info">Case study</Tag>
+          <Tag tone="info">{project.faultLog ? "Case study" : "Build log"}</Tag>
           <Tag tone="neutral">{project.status}</Tag>
         </div>
-        <h3 className="text-[19px] font-semibold leading-snug">
+        <h3
+          className={`font-semibold leading-snug ${featured ? "text-[19px] lg:text-2xl" : "text-[19px]"}`}
+        >
           {project.cardTitle}
         </h3>
         <p className="text-sm leading-relaxed text-text-muted">
@@ -87,8 +109,8 @@ export default function ProjectsSection() {
     <section id="projects" className="flex flex-col gap-7">
       <SectionHeading index="01" label="Projects" title="Featured work" />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {PROJECTS.map((p) => (
-          <ProjectCard key={p.slug} project={p} />
+        {PROJECTS.map((p, i) => (
+          <ProjectCard key={p.slug} project={p} featured={i === 0} />
         ))}
       </div>
 

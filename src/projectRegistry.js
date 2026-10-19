@@ -35,6 +35,70 @@ export const PROJECT_REGISTRY = {
     targetRole:
       "Actively pursuing full-time Controls Engineering and Systems Integration roles. The goal is permanent ownership of automation architecture: designing it, commissioning it, and being the person who actually understands why it works.",
   },
+  VFD_TEST_BENCH: {
+    id: "SYS-06",
+    type: "PROJECT",
+    title:
+      "VFD Test Bench — Cabinet Design, E-Stop Circuit & Automated Drive Testing",
+    slug: "vfd-test-bench",
+    cardTitle: "VFD test bench: designed and built from scratch",
+    summary:
+      "A 480 V test cabinet I designed, wired and programmed on ControlLogix. New PowerFlex 525s plug in, pick up their configuration through ADC, and get their output verified over EtherNet/IP — dozens tested so far before going on the spares shelf.",
+    category: "Panel build",
+    cardStack: "ControlLogix · PowerFlex 525 · ADC",
+    status: "OPERATIONAL",
+    statusColor: "text-status-ok bg-status-ok/10 border-status-ok/20",
+    metric: "Dozens of drives tested before going into spares",
+    description:
+      "My company buys PowerFlex 525 drives regularly as spares, and a new drive isn't a real spare until it's proven to work. So I built a cabinet to test them — the electrical design, wiring, E-stop circuit and PLC logic are all my own work. 480 V three-phase feeds the drive side of the panel, and a control transformer steps it down to 120 VAC for the logic side. A ControlLogix controller does the rest over EtherNet/IP: a new drive connects, receives its configuration automatically through Automatic Device Configuration (ADC), and the logic runs it and verifies its output voltage. Dozens of drives have been through it. Built entirely on Allen-Bradley hardware and software, and designed to grow into a bench for testing other PLC components.",
+    diagramType: "TEST_BENCH",
+    model3d: "POWERFLEX_525",
+    beforeAfter: {
+      label: "New spare drives",
+      before: "Unknown until a line is down and it's installed",
+      after: "Proven on the bench first — dozens tested",
+    },
+    build: [
+      {
+        title: "Power distribution",
+        body: "Brought 480 V three-phase into the cabinet for the drive side, then stepped it down through a control transformer to 120 VAC for the logic side — keeping drive power and control power separate.",
+        chips: ["480 V three-phase", "Control transformer", "120 VAC control"],
+      },
+      {
+        title: "E-stop circuit",
+        body: "An E-stop is wired to a safety contactor with a 120 VAC coil. The drive supplies its own 24 VDC, which runs out through the contactor's normally-open contact and back into the drive. Hit the E-stop and the coil drops, the contact opens, the 24 V loop breaks, and the drive shuts off its output.",
+        chips: ["Safety contactor", "24 VDC stop loop", "Hardwired E-stop"],
+      },
+      {
+        title: "Automatic Device Configuration",
+        body: "The ControlLogix holds the drive's configuration and, through ADC over EtherNet/IP, downloads it to a fresh unit automatically — a new VFD is ready to test without hand-entering parameters.",
+        chips: ["ControlLogix", "Studio 5000", "ADC"],
+      },
+      {
+        title: "Output verification",
+        body: "Over EtherNet/IP, the logic runs each drive and verifies it puts out voltage correctly, so a bad unit gets caught on the bench instead of when it's needed to replace a failed drive.",
+        chips: ["EtherNet/IP", "Ladder logic", "Drive testing"],
+      },
+    ],
+    fieldNotes:
+      "A spare drive sitting in a box isn't really a spare until you know it works. Testing it the day it arrives beats finding out it's bad in the middle of a breakdown.",
+    roadmap: [
+      "Extend the same plug-in-and-test workflow to ControlLogix controllers",
+      "Add testing for input and output cards",
+      "Grow it into a general-purpose test station for PLC components",
+    ],
+    tags: [
+      "Electrical Design",
+      "Panel Build",
+      "E-Stop Circuit",
+      "ControlLogix",
+      "PowerFlex 525",
+      "Studio 5000",
+      "ADC",
+      "EtherNet/IP",
+      "480 V Three-Phase",
+    ],
+  },
   CALJAN_REWIRE: {
     id: "SYS-01",
     type: "PROJECT",
