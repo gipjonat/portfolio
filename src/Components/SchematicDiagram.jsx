@@ -1732,7 +1732,7 @@ function TestBenchDiagram() {
       viewBox="0 0 760 420"
       className="w-full h-auto min-w-[560px]"
       role="img"
-      aria-label="VFD test bench system diagram: three-phase supply to the drive under test, control transformer to the 120 VAC logic side, controller linked to the drive over EtherNet/IP with ADC, and a safety circuit to the drive"
+      aria-label="VFD test bench system diagram: 480 V three-phase supply to the drive under test, control transformer to the 120 VAC logic side, ControlLogix linked to the drive over EtherNet/IP for ADC and running the test, and an E-stop safety contactor breaking the drive's 24 VDC stop loop"
       fontFamily="var(--font-mono)"
     >
       <title>VFD test bench — system overview</title>
@@ -1782,7 +1782,7 @@ function TestBenchDiagram() {
           strokeWidth="2"
         />
         <text x="458" y="21">
-          Safety circuit
+          E-stop loop
         </text>
         <rect
           x="560"
@@ -1817,7 +1817,7 @@ function TestBenchDiagram() {
         y={68}
         w={130}
         h={50}
-        title="3Ø SUPPLY"
+        title="3Ø 480 V"
         sub="Into the cabinet"
         stroke={BENCH.power}
       />
@@ -1855,7 +1855,7 @@ function TestBenchDiagram() {
         w={176}
         h={50}
         title="OUTPUT CHECK"
-        sub="Voltage verified"
+        sub="Verified over EtherNet/IP"
         stroke="var(--color-status-ok)"
       />
 
@@ -1875,7 +1875,7 @@ function TestBenchDiagram() {
         w={150}
         h={50}
         title="CONTROL XFMR"
-        sub="Steps down to 120 VAC"
+        sub="480 V → 120 VAC"
         stroke={BENCH.control}
       />
       <line
@@ -1916,7 +1916,7 @@ function TestBenchDiagram() {
         y={284}
         w={190}
         h={64}
-        title="CONTROLLER"
+        title="CONTROLLOGIX"
         sub="Studio 5000 logic"
         stroke={BENCH.comms}
       />
@@ -1925,8 +1925,8 @@ function TestBenchDiagram() {
         y={284}
         w={190}
         h={64}
-        title="SAFETY CIRCUIT"
-        sub="Custom design"
+        title="E-STOP CIRCUIT"
+        sub="Safety contactor · 120 V coil"
         stroke={BENCH.safety}
       />
       <line
@@ -1956,21 +1956,35 @@ function TestBenchDiagram() {
         fill="var(--color-hmi-bg)"
       />
       <text x="265" y="203" textAnchor="middle" fontSize="9" fill={BENCH.comms}>
-        EtherNet/IP · ADC config
+        EtherNet/IP · ADC + run
       </text>
 
-      {/* Safety circuit -> drive */}
+      {/* E-stop loop: the drive's own 24 VDC goes out through the safety
+          contactor's N.O. contact and back into the drive. E-stop drops the
+          coil, the contact opens, the loop breaks and the drive stops. */}
       <line
-        x1="440"
+        x1="428"
+        y1="134"
+        x2="428"
+        y2="277"
+        stroke={BENCH.safety}
+        strokeWidth="2"
+      />
+      <BenchArrow x={428} y={284} dir="down" color={BENCH.safety} />
+      <line
+        x1="452"
         y1="284"
-        x2="440"
+        x2="452"
         y2="134"
         stroke={BENCH.safety}
         strokeWidth="2"
       />
-      <BenchArrow x={440} y={127} dir="up" color={BENCH.safety} />
-      <text x="448" y="230" fontSize="9" fill={BENCH.safety}>
-        Safety
+      <BenchArrow x={452} y={127} dir="up" color={BENCH.safety} />
+      <text x="460" y="204" fontSize="9" fill={BENCH.safety}>
+        24 VDC
+      </text>
+      <text x="460" y="216" fontSize="9" fill={BENCH.safety}>
+        stop loop
       </text>
 
       {/* Roadmap */}
