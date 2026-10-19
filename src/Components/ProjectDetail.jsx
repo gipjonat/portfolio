@@ -226,7 +226,11 @@ export default function ProjectDetail({ projectKey, data }) {
 
       {data.model3d && <ProjectModel model={data.model3d} />}
 
-      {data.diagramType && <SchematicDiagram diagramType={data.diagramType} />}
+      {(data.diagrams ?? (data.diagramType ? [data.diagramType] : [])).map(
+        (d) => (
+          <SchematicDiagram key={d} diagramType={d} />
+        ),
+      )}
 
       {data.build && <BuildSections sections={data.build} />}
 
