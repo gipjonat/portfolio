@@ -2084,50 +2084,81 @@ function TestBenchDiagram() {
   );
 }
 
-// Maps a point from Jonathon's hand sketch of the cabinet (paint canvas
-// pixels) onto this diagram, so the layout keeps his proportions.
-const SK = { ox: 60, oy: 40, s: 0.378, x0: 93, y0: 95 };
-const skX = (x) => SK.ox + (x - SK.x0) * SK.s;
-const skY = (y) => SK.oy + (y - SK.y0) * SK.s;
+// ── Panel layout helpers ──────────────────────────────────────────────
+// A tidy, representative front view of the test cabinet: wire duct frames
+// the panel, components sit in rows, logic side on the left, power side on
+// the right, supply equipment outside. Not an as-built drawing.
 
-function LayoutPart({
-  x1,
-  y1,
-  x2,
-  y2,
-  stroke,
-  fill = BENCH.box,
-  dashed,
-  children,
-}) {
-  const x = skX(x1);
-  const y = skY(y1);
+const LAYOUT_DUCT = "#1b2127";
+
+function LayoutDuct({ x, y, w, h }) {
+  const vertical = h > w;
+  const n = Math.floor((vertical ? h : w) / 10);
   return (
     <g>
       <rect
         x={x}
         y={y}
-        width={skX(x2) - x}
-        height={skY(y2) - y}
+        width={w}
+        height={h}
+        rx="2"
+        fill={LAYOUT_DUCT}
+        stroke={BENCH.edge}
+        strokeWidth="1"
+      />
+      {Array.from({ length: n }, (_, i) =>
+        vertical ? (
+          <line
+            key={i}
+            x1={x + 3}
+            x2={x + w - 3}
+            y1={y + 5 + i * 10}
+            y2={y + 5 + i * 10}
+            stroke={BENCH.edge}
+            strokeOpacity="0.5"
+          />
+        ) : (
+          <line
+            key={i}
+            y1={y + 3}
+            y2={y + h - 3}
+            x1={x + 5 + i * 10}
+            x2={x + 5 + i * 10}
+            stroke={BENCH.edge}
+            strokeOpacity="0.5"
+          />
+        ),
+      )}
+    </g>
+  );
+}
+
+function LayoutPart({ x, y, w, h, stroke, children }) {
+  return (
+    <g>
+      <rect
+        x={x}
+        y={y}
+        width={w}
+        height={h}
         rx="3"
-        fill={fill}
+        fill={BENCH.box}
         stroke={stroke}
         strokeWidth="1.5"
-        strokeDasharray={dashed ? "4 3" : undefined}
       />
       {children}
     </g>
   );
 }
 
-function LayoutLabel({
+function LayoutTag({
   x,
   y,
-  lines,
+  children,
   color = BENCH.text,
   size = 9,
   anchor = "middle",
-  rotate,
+  weight = 700,
 }) {
   return (
     <text
@@ -2135,295 +2166,330 @@ function LayoutLabel({
       y={y}
       textAnchor={anchor}
       fontSize={size}
-      fontWeight="700"
+      fontWeight={weight}
       fill={color}
-      transform={rotate ? `rotate(${rotate} ${x} ${y})` : undefined}
     >
-      {lines.map((l, i) => (
-        <tspan key={l} x={x} dy={i === 0 ? 0 : size + 3}>
-          {l}
-        </tspan>
-      ))}
+      {children}
     </text>
   );
 }
 
 function TestBenchLayoutDiagram() {
-  // Front view of the cabinet, redrawn from the builder's own sketch.
-  // Simplified: positions and sizes are approximate.
-  const duct = "#1b2127";
-  const cx = (a, b) => (skX(a) + skX(b)) / 2;
-  const cy = (a, b) => (skY(a) + skY(b)) / 2;
-
+  // Cabinet interior: x 40–560, y 50–390
   return (
     <svg
-      viewBox="0 0 760 425"
+      viewBox="0 0 760 420"
       className="w-full h-auto min-w-[560px]"
       role="img"
-      aria-label="Simplified panel layout of the VFD test bench: PLC modules, safety contactor, branch breakers and a neutral terminal strip on the left; wire duct around them; VFDs and the main breaker on the right; the knife switch box and step-down transformer outside the cabinet on the right; a second transformer for clean PLC power above the cabinet."
+      aria-label="Representative panel layout of the VFD test bench. Logic side on the left: ControlLogix chassis, safety contactor, neutral and small-power terminals, and 120 VAC branch breakers. Power side on the right: PowerFlex 525 drives and the main breaker. Outside the cabinet: the knife switch box with 480 V coming in, the step-down transformer, and transformer 2 for clean PLC power."
       fontFamily="var(--font-mono)"
     >
-      <title>VFD test bench — panel layout (simplified)</title>
+      <title>VFD test bench — representative panel layout</title>
 
-      {/* Transformer 2, above the cabinet */}
-      <LayoutPart x1={165} y1={20} x2={487} y2={85} stroke={BENCH.control}>
-        <LayoutLabel
-          x={cx(165, 487)}
-          y={cy(20, 85) + 3}
-          lines={["XFMR 2"]}
-          color={BENCH.control}
-        />
+      {/* Transformer 2 (above the cabinet) */}
+      <LayoutPart x={80} y={12} w={150} h={26} stroke={BENCH.control}>
+        <LayoutTag x={155} y={29} color={BENCH.control}>
+          XFMR 2
+        </LayoutTag>
       </LayoutPart>
-      <LayoutLabel
-        x={skX(487) + 8}
-        y={cy(20, 85) + 3}
-        lines={["Clean power to the PLC"]}
+      <LayoutTag
+        x={240}
+        y={29}
         anchor="start"
         size={8}
+        weight={400}
         color={BENCH.muted}
+      >
+        Clean power to the PLC
+      </LayoutTag>
+      <line
+        x1="155"
+        y1="38"
+        x2="155"
+        y2="50"
+        stroke={BENCH.control}
+        strokeWidth="2"
       />
 
       {/* Cabinet */}
       <rect
-        x={skX(93)}
-        y={skY(95)}
-        width={skX(1467) - skX(93)}
-        height={skY(962) - skY(95)}
+        x="40"
+        y="50"
+        width="520"
+        height="340"
         rx="6"
-        fill="none"
+        fill="#0f1317"
         stroke={BENCH.edge}
         strokeWidth="2.5"
       />
-      <text
-        x={skX(93) + 4}
-        y={skY(962) + 16}
-        fontSize="9"
-        fontWeight="700"
-        letterSpacing="1.5"
-        fill={BENCH.muted}
-      >
-        TEST CABINET
-      </text>
 
-      {/* Wire duct */}
-      <LayoutPart
-        x1={103}
-        y1={152}
-        x2={133}
-        y2={776}
-        stroke={BENCH.edge}
-        fill={duct}
-      >
-        <LayoutLabel
-          x={cx(103, 133) + 3}
-          y={cy(152, 776)}
-          lines={["WIRE DUCT"]}
-          color={BENCH.muted}
-          size={8}
-          rotate={-90}
-        />
-      </LayoutPart>
-      <LayoutPart
-        x1={110}
-        y1={786}
-        x2={950}
-        y2={886}
-        stroke={BENCH.edge}
-        fill={duct}
-      >
-        <LayoutLabel
-          x={cx(110, 950)}
-          y={cy(786, 886) + 3}
-          lines={["WIRE DUCT"]}
-          color={BENCH.muted}
-          size={8}
-        />
-      </LayoutPart>
-      <LayoutPart
-        x1={970}
-        y1={148}
-        x2={1100}
-        y2={891}
-        stroke={BENCH.edge}
-        fill={duct}
-      >
-        <LayoutLabel
-          x={cx(970, 1100) + 3}
-          y={cy(148, 891)}
-          lines={["WIRE DUCT"]}
-          color={BENCH.muted}
-          size={8}
-          rotate={-90}
-        />
-      </LayoutPart>
+      {/* Wire duct frame */}
+      <LayoutDuct x={52} y={62} w={496} h={14} />
+      <LayoutDuct x={52} y={364} w={496} h={14} />
+      <LayoutDuct x={52} y={76} w={14} h={288} />
+      <LayoutDuct x={534} y={76} w={14} h={288} />
+      <LayoutDuct x={330} y={76} w={14} h={288} />
+      <LayoutDuct x={66} y={160} w={264} h={12} />
+      <LayoutDuct x={66} y={262} w={264} h={12} />
+      <LayoutDuct x={344} y={262} w={190} h={12} />
 
-      {/* Neutral / small-power terminal strip */}
-      <LayoutPart x1={150} y1={168} x2={196} y2={551} stroke={BENCH.control}>
-        {Array.from({ length: 12 }, (_, i) => (
-          <line
-            key={i}
-            x1={skX(150) + 2}
-            x2={skX(196) - 2}
-            y1={skY(168) + 8 + i * 11}
-            y2={skY(168) + 8 + i * 11}
-            stroke={BENCH.control}
-            strokeOpacity="0.5"
-          />
-        ))}
-      </LayoutPart>
-      <LayoutLabel
-        x={skX(196) + 6}
-        y={skY(420)}
-        lines={["NEUTRALS /", "SMALL POWER"]}
-        anchor="start"
-        size={8}
-        color={BENCH.control}
-      />
+      {/* Zone labels */}
+      <rect x="70" y="64" width="98" height="10" fill={LAYOUT_DUCT} />
+      <LayoutTag x={74} y={72} anchor="start" size={7} color={BENCH.control}>
+        LOGIC · 120 VAC
+      </LayoutTag>
+      <rect x="348" y="64" width="86" height="10" fill={LAYOUT_DUCT} />
+      <LayoutTag x={352} y={72} anchor="start" size={7} color={BENCH.power}>
+        POWER · 480 V
+      </LayoutTag>
 
-      {/* PLC modules */}
-      <LayoutPart x1={277} y1={177} x2={585} y2={267} stroke={BENCH.comms}>
+      {/* ── Logic side ── */}
+      {/* Row 1: ControlLogix chassis */}
+      <LayoutPart x={80} y={88} w={150} h={60} stroke={BENCH.comms}>
         {Array.from({ length: 7 }, (_, i) => (
-          <rect
-            key={i}
-            x={skX(285) + i * 16}
-            y={skY(185)}
-            width="12"
-            height={skY(259) - skY(185)}
-            rx="1"
-            fill="none"
-            stroke={BENCH.comms}
-            strokeOpacity="0.55"
-          />
-        ))}
-      </LayoutPart>
-      <LayoutLabel
-        x={skX(585) + 8}
-        y={cy(177, 267) + 3}
-        lines={["CONTROLLOGIX"]}
-        anchor="start"
-        color={BENCH.comms}
-      />
-
-      {/* Safety contactor */}
-      <LayoutPart x1={303} y1={520} x2={505} y2={603} stroke={BENCH.safety}>
-        <LayoutLabel
-          x={cx(303, 505)}
-          y={cy(520, 603) - 2}
-          lines={["SAFETY", "CONTACTOR"]}
-          color={BENCH.safety}
-          size={8}
-        />
-      </LayoutPart>
-
-      {/* Branch breakers */}
-      <LayoutLabel
-        x={cx(277, 485)}
-        y={skY(727) - 6}
-        lines={["BREAKERS · 120 VAC"]}
-        color={BENCH.control}
-        size={8}
-      />
-      <LayoutPart x1={277} y1={727} x2={485} y2={755} stroke={BENCH.control}>
-        {Array.from({ length: 8 }, (_, i) => (
-          <line
-            key={i}
-            x1={skX(277) + 9 + i * 9.5}
-            x2={skX(277) + 9 + i * 9.5}
-            y1={skY(727) + 2}
-            y2={skY(755) - 2}
-            stroke={BENCH.control}
-            strokeOpacity="0.6"
-          />
-        ))}
-      </LayoutPart>
-
-      {/* Unlabeled component above the drives */}
-      <LayoutPart
-        x1={1130}
-        y1={348}
-        x2={1380}
-        y2={461}
-        stroke={BENCH.edge}
-        dashed
-      />
-
-      {/* VFDs */}
-      <LayoutPart x1={1132} y1={487} x2={1380} y2={734} stroke={BENCH.power}>
-        {[0, 1, 2].map((i) => (
           <g key={i}>
             <rect
-              x={skX(1145) + i * 30}
-              y={skY(500)}
-              width="24"
-              height={skY(680) - skY(500)}
-              rx="2"
+              x={86 + i * 20.5}
+              y={94}
+              width="16"
+              height="48"
+              rx="1.5"
               fill="none"
-              stroke="var(--color-brand)"
-              strokeOpacity="0.8"
+              stroke={BENCH.comms}
+              strokeOpacity="0.6"
             />
-            <rect
-              x={skX(1145) + i * 30 + 5}
-              y={skY(512)}
-              width="14"
-              height="5"
-              fill="var(--color-status-ok)"
-              opacity="0.7"
+            <circle
+              cx={94 + i * 20.5}
+              cy={100}
+              r="1.6"
+              fill={i < 3 ? "var(--color-status-ok)" : "var(--color-brand)"}
             />
           </g>
         ))}
       </LayoutPart>
-      <LayoutLabel
-        x={cx(1132, 1380)}
-        y={skY(722)}
-        lines={["POWERFLEX 525s"]}
+      <LayoutTag x={240} y={115} anchor="start" color={BENCH.comms}>
+        CONTROLLOGIX
+      </LayoutTag>
+      <LayoutTag
+        x={240}
+        y={128}
+        anchor="start"
         size={8}
-        color="var(--color-brand)"
-      />
+        weight={400}
+        color={BENCH.muted}
+      >
+        Chassis + I/O
+      </LayoutTag>
 
-      {/* Main breaker */}
-      <LayoutPart x1={1270} y1={753} x2={1362} y2={901} stroke={BENCH.power} />
-      <LayoutLabel
-        x={cx(1270, 1362)}
-        y={skY(901) + 12}
-        lines={["MAIN BREAKER"]}
-        color={BENCH.power}
-        size={8}
-      />
+      {/* Row 2: safety contactor + terminals */}
+      <LayoutPart x={80} y={186} w={84} h={62} stroke={BENCH.safety}>
+        <rect
+          x={98}
+          y={196}
+          width="48"
+          height="16"
+          rx="2"
+          fill="none"
+          stroke={BENCH.safety}
+          strokeOpacity="0.6"
+        />
+        <LayoutTag x={122} y={228} size={8} color={BENCH.safety}>
+          SAFETY
+        </LayoutTag>
+        <LayoutTag x={122} y={239} size={8} color={BENCH.safety}>
+          CONTACTOR
+        </LayoutTag>
+      </LayoutPart>
+      <LayoutPart x={180} y={198} w={138} h={34} stroke={BENCH.control}>
+        {Array.from({ length: 16 }, (_, i) => (
+          <rect
+            key={i}
+            x={185 + i * 8}
+            y={203}
+            width="6"
+            height="24"
+            rx="1"
+            fill="none"
+            stroke={BENCH.control}
+            strokeOpacity="0.55"
+          />
+        ))}
+      </LayoutPart>
+      <LayoutTag x={249} y={246} size={8} color={BENCH.control}>
+        NEUTRALS · SMALL POWER
+      </LayoutTag>
 
-      {/* Knife switch box + step-down transformer, outside the cabinet */}
-      <LayoutPart x1={1488} y1={280} x2={1722} y2={963} stroke={BENCH.power}>
-        <LayoutLabel
-          x={cx(1488, 1722)}
-          y={skY(520)}
-          lines={["KNIFE", "SWITCH", "BOX", "", "3Ø 480 V IN"]}
-          color={BENCH.power}
+      {/* Row 3: branch breakers */}
+      <LayoutTag x={80} y={292} anchor="start" size={8} color={BENCH.control}>
+        BREAKERS · 120 VAC
+      </LayoutTag>
+      <LayoutPart x={80} y={300} w={168} h={46} stroke={BENCH.control}>
+        {Array.from({ length: 8 }, (_, i) => (
+          <g key={i}>
+            <rect
+              x={86 + i * 20}
+              y={306}
+              width="16"
+              height="34"
+              rx="1.5"
+              fill="none"
+              stroke={BENCH.control}
+              strokeOpacity="0.55"
+            />
+            <rect
+              x={91 + i * 20}
+              y={316}
+              width="6"
+              height="10"
+              rx="1"
+              fill={BENCH.control}
+              opacity="0.5"
+            />
+          </g>
+        ))}
+      </LayoutPart>
+
+      {/* ── Power side ── */}
+      {/* Row 1: drives under test */}
+      {[362, 417, 472].map((x) => (
+        <g key={x}>
+          <rect
+            x={x}
+            y={92}
+            width="46"
+            height="140"
+            rx="3"
+            fill={BENCH.box}
+            stroke="var(--color-brand)"
+            strokeWidth="1.5"
+          />
+          <rect
+            x={x + 6}
+            y={100}
+            width="34"
+            height="10"
+            rx="1"
+            fill="var(--color-status-ok)"
+            opacity="0.65"
+          />
+          <circle
+            cx={x + 23}
+            cy={126}
+            r="8"
+            fill="none"
+            stroke="var(--color-status-info)"
+            strokeOpacity="0.8"
+          />
+          {Array.from({ length: 6 }, (_, i) => (
+            <line
+              key={i}
+              x1={x + 8}
+              x2={x + 38}
+              y1={156 + i * 10}
+              y2={156 + i * 10}
+              stroke={BENCH.edge}
+            />
+          ))}
+        </g>
+      ))}
+      <LayoutTag x={440} y={250} size={9} color="var(--color-brand)">
+        POWERFLEX 525s
+      </LayoutTag>
+
+      {/* Row 2: main breaker */}
+      <LayoutPart x={410} y={286} w={60} h={52} stroke={BENCH.power}>
+        <rect
+          x={432}
+          y={298}
+          width="16"
+          height="22"
+          rx="2"
+          fill="none"
+          stroke={BENCH.power}
+          strokeOpacity="0.7"
         />
       </LayoutPart>
-      <LayoutPart x1={1495} y1={979} x2={1720} y2={1070} stroke={BENCH.control}>
-        <LayoutLabel
-          x={cx(1495, 1720)}
-          y={cy(979, 1070) - 3}
-          lines={["STEP-DOWN", "480 → 120 VAC"]}
-          color={BENCH.control}
-          size={8}
-        />
-      </LayoutPart>
+      <LayoutTag x={440} y={354} size={8} color={BENCH.power}>
+        MAIN BREAKER
+      </LayoutTag>
 
-      {/* Feeds into the cabinet */}
+      {/* ── Outside the cabinet ── */}
+      <LayoutPart x={600} y={110} w={96} h={210} stroke={BENCH.power}>
+        <rect
+          x={628}
+          y={150}
+          width="40"
+          height="60"
+          rx="3"
+          fill="none"
+          stroke={BENCH.power}
+          strokeOpacity="0.6"
+        />
+        <line
+          x1="640"
+          y1="165"
+          x2="656"
+          y2="195"
+          stroke={BENCH.power}
+          strokeWidth="2"
+        />
+        <LayoutTag x={648} y={238} color={BENCH.power}>
+          KNIFE
+        </LayoutTag>
+        <LayoutTag x={648} y={251} color={BENCH.power}>
+          SWITCH
+        </LayoutTag>
+        <LayoutTag x={648} y={278} size={8} weight={400} color={BENCH.muted}>
+          3Ø 480 V in
+        </LayoutTag>
+      </LayoutPart>
+      <LayoutPart x={600} y={340} w={96} h={50} stroke={BENCH.control}>
+        <LayoutTag x={648} y={361} size={8} color={BENCH.control}>
+          STEP-DOWN
+        </LayoutTag>
+        <LayoutTag x={648} y={374} size={8} weight={400} color={BENCH.muted}>
+          480 → 120 VAC
+        </LayoutTag>
+      </LayoutPart>
       <line
-        x1={skX(1488)}
-        y1={skY(830)}
-        x2={skX(1362) + 10}
-        y2={skY(830)}
+        x1="648"
+        y1="320"
+        x2="648"
+        y2="340"
         stroke={BENCH.power}
         strokeWidth="3"
       />
-      <BenchArrow
-        x={skX(1362) + 2}
-        y={skY(830)}
-        dir="left"
-        color={BENCH.power}
+
+      {/* Feeds into the cabinet */}
+      <line
+        x1="600"
+        y1="312"
+        x2="568"
+        y2="312"
+        stroke={BENCH.power}
+        strokeWidth="3"
       />
+      <BenchArrow x={560} y={312} dir="left" color={BENCH.power} />
+      <line
+        x1="600"
+        y1="368"
+        x2="568"
+        y2="368"
+        stroke={BENCH.control}
+        strokeWidth="2"
+      />
+      <BenchArrow x={560} y={368} dir="left" color={BENCH.control} />
+
+      <LayoutTag
+        x={40}
+        y={410}
+        anchor="start"
+        size={8}
+        weight={400}
+        color={BENCH.muted}
+      >
+        Representative layout · not to scale
+      </LayoutTag>
     </svg>
   );
 }
@@ -2440,7 +2506,7 @@ const DIAGRAM_COMPONENTS = {
 // Section heading per diagram; anything not listed uses the default.
 const DIAGRAM_TITLES = {
   TEST_BENCH: "Power & Control",
-  TEST_BENCH_LAYOUT: "Panel Layout (simplified)",
+  TEST_BENCH_LAYOUT: "Panel Layout (representative)",
 };
 
 export default function SchematicDiagram({ diagramType }) {
